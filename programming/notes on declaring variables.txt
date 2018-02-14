@@ -1,0 +1,9 @@
+naming variables
+
+be descriptive
+make sure its of an appropiate length
+do not use spaces
+do not use special symbol
+distingish between upper and lowercase
+when referring to existing variable names be aware of your spelling
+variables cannot begin with a number

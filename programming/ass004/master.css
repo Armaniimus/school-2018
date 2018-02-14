@@ -1,0 +1,123 @@
+html, body{
+    padding: 0px;
+    margin: 0px;
+}
+
+.button {
+    color: #444;
+    height: 60px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 10px;
+    background-color: rgb(255, 255, 0);
+
+    border-style: solid;
+    border-width: 1px 2px 2px 1px;
+    border-color: #bbb #888 #888 #bbb;
+}
+
+.button:hover {
+    background-color: rgb(247, 247, 0);
+    color: #353535;
+    border-width: 2px 1px 1px 2px;
+    border-color: #757575 #a5a5a5 #a5a5a5 #757575;
+    cursor: pointer;
+}
+
+.tables td,
+.tables th,
+.tables {
+    border: 1px solid #555;
+    border-collapse: collapse;
+    border-spacing: 0px;
+    padding: 10px;
+}
+
+.tables td:last-child {
+    text-align: center;
+    width:30px;
+}
+
+.result {
+    border: solid #666 0px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+
+    width: 50px;
+    height: 20px;
+}
+
+.row .result:nth-of-type(1) {
+    border-top-width: 1px;
+}
+
+h4, h3 {
+    padding: 0px;
+    margin: 0px;
+    font-size: 20px;
+    color: #333;
+}
+
+.header {
+    padding: 15px;
+    background-color: yellow;
+    border-bottom: solid 1px #999;
+}
+
+.header h1 {
+    margin: 0px;
+    color: #444;
+}
+
+main {
+    padding: 30px;
+}
+
+.result-box, .invoer-box {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+
+    border: solid 1px #999;
+    padding: 15px;
+}
+
+.centerer {
+    margin: 0 auto;
+}
+
+.centerer-text {
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+.content-header {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+
+    margin-bottom: 0px;
+    color: #444;
+    background-color: yellow;
+    padding: 5px;
+    padding-left: 15px;
+
+    border: solid #999 0px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+}
+
+h5 {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+h6 {
+    font-weight: normal;
+    font-size: 14px;
+    padding: 0px;
+    margin: 0px;
+}

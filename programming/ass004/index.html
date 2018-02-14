@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>taxi_kosten</title>
+        <link rel="stylesheet" href="grid.css">
+        <link rel="stylesheet" href="master.css">
+    </head>
+    <body>
+        <header class="header">
+            <h1>Taxi kosten</h1>
+        </header>
+
+        <main>
+            <!-- content container -->
+            <div class="centerer col-12 col-m-9 col-la-8 col-h-6">
+                <!--Content header  -->
+                <div class="col-12">
+                    <h2 class="content-header centerer-text">Bereken uw taxi rit</h2>
+                </div>
+
+                <!--/////////
+                 Invoer box
+                /////////-->
+                <div id="invoer-box" class="invoer-box">
+                    <div class="col-12 col-m-7 col-la-7 col-h-6 centerer">
+
+                        <table class="tables col-12">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Vertrek-tijd</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Datum:</td>
+                                    <td><input class="times" type="date" id="begin-datum" name=""></td>
+                                </tr>
+                                <tr>
+                                    <td>Tijd:</td>
+                                    <td><input class="times" type="time"  id="begin-tijd" name="" value="00:00">uu:mm</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br>
+
+                        <table class="tables col-12">
+                            <thead>
+                                <tr>
+                                    <th>Te rijden Kilometers</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="number" id="kilometers" name="" value="0"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br>
+
+                        <button class="button col-12" id="submit">Bereken</button>
+                    </div>
+                </div>
+
+                <!--/////////
+                 result box
+                /////////-->
+                <div id="result-box" class="result-box hidden">
+                    <div class="col-12 col-m-7 col-la-7 col-h-6 centerer">
+                        <h4 class="">Uw rit kosten bedragen</h4>
+
+                        <!-- totaal -->
+                        <table class="tables col-12">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Totaal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Totaal</td>
+                                    <td id="result-totaal">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br>
+                        <br>
+
+                        <h4 class="">Reken details</h4>
+
+                        <!-- kilometer resultaten -->
+                        <table class="tables col-12">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Kilometer prijs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Aantal kilometers:</td>
+                                    <td id="result-kms">0</td>
+                                </tr>
+                                <tr>
+                                    <td>Prijs per kilometer:</td>
+                                    <td id="result-prijs-per-km">0</td>
+                                </tr>
+                                <tr>
+                                    <td>Totaal prijs voor de kilometers:</td>
+                                    <td id="result-kilometer-totaal">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br>
+
+                        <!-- rit duur results -->
+                        <table class="tables col-12">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Standaard ritduur prijs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Gemiddelde snelheid:</td>
+                                    <td id="result-gemiddelde-snelheid"></td>
+                                </tr>
+
+                                <tr>
+                                    <td>Ritduur</td>
+                                    <td id="result-ritduur">0</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Standaard prijs per minuut</td>
+                                    <td id="result-ritprijs-per-minuut">0</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Totaal:</td>
+                                    <td id="result-ritduur-kosten">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br>
+
+                        <!-- toeslag resultaten -->
+                        <table class="tables col-12">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Toeslagen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Toeslag bijzondere uren voor 8:00 of na 18:00</td>
+                                    <td id="result-toeslag-bijzonde-uren-per-minuut">0</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Totaal toeslag bijzondere uren:</td>
+                                    <td id="result-toeslag-bijzondere-uren">0</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Weekend toeslag vrijdag na 22:00 tot maandag voor 7:00:</td>
+                                    <td id="result-weekend-toeslag-%">0</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Totaal toeslag weekend:</td>
+                                    <td id="result-weekend-toeslag">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br>
+
+                        <!-- knop -->
+                        <button class="button col-12" id="nieuwe-berekening" type="button" name="button">Nieuwe berekening</button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+    </body>
+</html>
+<script src="004_main.js"></script>
