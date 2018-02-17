@@ -40,7 +40,6 @@ function ArrayToHTMLTable1($dataArray) {
 //Variables input:
     //$dataArray(requires an 2dimensional Array with strings in them)
 function ArrayToHTMLTable2($dataArray) {
-
     //opens table;
     $res = "<table border='1' width='100%'>";
 
@@ -150,4 +149,46 @@ function addArticleForm($columnNames) {
 
     return $res;
 }
-?>
+
+//F02; D:selectFromDB(); S(G)
+//Status: Good
+//FunctionDescription:
+    //creates table from the provided data and adds buttons
+//Variables input:
+    //$dataArray(requires an 2dimensional Array with strings in them)
+function ArrayToHTMLTable5($dataArray) {
+
+    //opens table;
+    $res = "<table border='1' width='100%'>";
+
+    //generates the tableheads 1 by 1
+    $tableHeads = "";
+    $row = 0;
+
+    for ($col=0; $col<=(count($dataArray[$row])-1); $col++) {
+        $tableHeads .= "<th>" . $dataArray[$row][$col] . "</th>";
+    }
+    $tableHeads .= "<th colspan='" . 2 . "'>Buttons</th>";
+    $res .= "<tr>" . $tableHeads . "</tr>";
+
+    //generate table main rows
+    $row++;
+    for ($row=$row; $row<count($dataArray); $row++) {
+        $tableMainRow = "";
+        for ($col=0; $col<count($dataArray[$row]); $col++) {
+            $tableMainRow .= "<td><input name=". $dataArray[0][$col] . " style='width: 100%; border: none;' value='" . $dataArray[$row][$col] . "'></td>";
+        }
+
+        //creeërt de buttons voor de tabel
+        $buttons =
+        "<td><button class='upd-button' value='update_row" . $row . "'>Update</button></td>
+        <td><button class='del-button' value='delete_row" . $row . "'>Delete</button></td>";
+
+        $tableMainRow .= $buttons;
+        $res .= "<tr id='row" . $row . "'>" . $tableMainRow . "</tr>";
+
+    }
+    $res .= "</table>";
+
+    return $res;
+}

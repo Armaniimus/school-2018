@@ -1,7 +1,7 @@
 <?php
+    // var_dump($_POST);
 
 if (isset($_POST['dbcrud']) ) {
-
     if ($_POST['dbcrud'] == "create") {
         create($tableNames[0], $columnNames[0]);
     }
@@ -31,7 +31,7 @@ function read($tableName, $columnNames) {
     $where = "where id = " . $id;
 
     $dataArray = generate2dArrayFromDB($tableName, $columnNames, $where);
-    $dataArray = ArrayToHTMLTable1($dataArray);
+    $dataArray = ArrayToHTMLTable5($dataArray);
 
     return "$dataArray";
 }
@@ -60,7 +60,7 @@ function deleteColumn($tableName) {
 if (!isset($dataArray) ) {
     $where = "";
     $dataArray = generate2dArrayFromDB($tableNames[0], $columnNames[0], $where);
-    $dataArray = ArrayToHTMLTable1($dataArray);
+    $dataArray = ArrayToHTMLTable5($dataArray);
 }
 
 echo "$dataArray";
