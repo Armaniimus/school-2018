@@ -7,6 +7,7 @@
     <head>
         <meta charset="utf-8">
         <title>form2</title>
+        <link rel="stylesheet" href="css/master.css">
     </head>
     <body>
         <form action="showforms.php" method="post">
