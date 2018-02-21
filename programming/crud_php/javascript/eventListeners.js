@@ -6,7 +6,7 @@ function SetEventListeners() {
         let row = document.getElementById(currentID);
         if (row) {
             row.addEventListener('click', function(e, er) {
-                if (event.target.tagName == "BUTTON") {
+                if (e.target.tagName == "BUTTON") {
 
                     const sendObj = {
                         crudFunc: "",
@@ -15,11 +15,11 @@ function SetEventListeners() {
                         leeftijd: row.querySelector("td input[name='leeftijd']").value
                     }
 
-                    if (event.target.className == "upd-button") {
+                    if (e.target.className == "upd-button") {
                         sendObj.crudFunc = "update";
                         SubmitFunction(sendObj);
                     }
-                    else if (event.target.className == "del-button") {
+                    else if (e.target.className == "del-button") {
                         sendObj.crudFunc = "delete";
                         SubmitFunction(sendObj);
                     }

@@ -6,7 +6,7 @@ function SubmitCallback(result) {
 }
 
 function SubmitFunction(sendObj) {
-    console.log(sendObj);
+
     let payload = {
         dbcrud: "",
         id: "",
