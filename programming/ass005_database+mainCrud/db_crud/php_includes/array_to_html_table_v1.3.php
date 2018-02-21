@@ -189,6 +189,5 @@ function ArrayToHTMLTable5($dataArray) {
 
     }
     $res .= "</table>";
-
     return $res;
 }

@@ -123,13 +123,12 @@ const ajax_module = (function() {
 
         post: (function (url, selectorObject, callbackFunc, payload, cache) {
             post (url, selectorObject, callbackFunc, payload, cache);
-            console.log("send Ajax")
         }),
 
         putJson: (function (url, selectorObject, callbackFunc, payload, cache) {
             putJson (url, selectorObject, callbackFunc, payload, cache);
         }),
-
+        
         postFile: (function (url, selectorObject, callbackFunc, payload, cache) {
             postFile (url, selectorObject, callbackFunc, payload, cache);
         }),
