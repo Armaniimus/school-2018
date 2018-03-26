@@ -1,0 +1,81 @@
+html,
+body {
+    margin: 0px;
+    width: 100%
+}
+
+.header {
+    height: 90px;
+    margin: 0px;
+    position: static;
+
+    /* Colors */
+    color: #efe;
+    text-shadow: 1px 1px #131;
+    background-color: #383;
+}
+
+.footer {
+    height: 60px;
+    margin: 0px;
+    position: static;
+
+    /* Colors */
+    color: #efe;
+    text-shadow: 1px 1px #131;
+    background-color: #383;
+}
+
+.copyright {
+    padding: 20px 30px;
+}
+
+main {
+    padding: 15px;
+}
+
+.logo {
+    padding: 15px;
+    color: white;
+    font-size: 25px;
+}
+
+.generatedTable,
+.generatedTable td:not(.button),
+.generatedTable th,
+.generatedTable tr {
+    border-collapse: collapse;
+    border-color: #222;
+    padding: 5px;
+}
+
+.generatedTableButton {
+    /* display settings */
+    box-sizing: border-box;
+    display: inline-block;
+    cursor: pointer;
+
+    /* size settings */
+    height: 30px;
+    padding: 5px;
+
+    /* color setings */
+    background-color: #5d5;
+    box-shadow: 1px 1px 1px 0px #3b3;
+    color: white;
+
+    /* text settings */
+    text-decoration: none;
+    text-shadow: 1px 1px 1px darkgreen;
+
+    /* border settings */
+    border-color: #3a3;
+    border-style: solid;
+    border-width: 1px 2px 2px 1px;
+}
+
+.generatedTableButton:hover {
+    border-width: 2px 1px 1px 2px;
+    border-color: #3a3;
+    background-color: #5c5;
+}

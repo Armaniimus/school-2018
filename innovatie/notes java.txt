@@ -1,0 +1,19 @@
+
+intellij idea community edition
+
+byte en boolean
+
+
+
+byte getal van 0 tot 125. 	-> byte b = 100
+boolean true of false.		-> boolean = false
+
+short bijna het zelfde als int maar veel kleinere getallen opslaan
+int een heel getal en niet groter dan 10 cijfer in de plus of min
+
+long
+
+float gebroken getallen van max 7 cijfers
+double voor gebroken getallen tot 15 cijfers achter de comma
+char
+

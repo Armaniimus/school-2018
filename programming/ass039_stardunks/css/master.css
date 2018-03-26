@@ -1,0 +1,86 @@
+html,
+body {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+}
+
+.title {
+    margin: 0 0 10px 0;
+    padding: 5px;
+    color: #efe;
+    text-shadow: 2px 2px #131;
+    background-color: #383;
+}
+
+main {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.generatedTable,
+.generatedTable tr,
+.generatedTable tr td,
+.generatedTable tr th,
+
+.generatedTableCreate,
+.generatedTableCreate tr,
+.generatedTableCreate tr td,
+.generatedTableCreate tr th {
+    border-collapse: collapse;
+    border: solid black 1px;
+}
+
+.generatedTable tr td,
+.generatedTable tr th,
+.generatedTableCreate tr th,
+.generatedTableCreate tr td:first-child {
+    padding: 8px;
+}
+
+.generatedTableCreate tr td input {
+    box-sizing: border-box;
+    height: calc(1rem + 16px);
+    width: calc(100% + 1px);
+    margin-left: 0px;
+    padding: 8px;
+    display: block;
+    border: 0px grey solid;
+}
+
+.generatedTableButton {
+    text-decoration: none;
+    display: inline-block;
+    /* border styling */
+    background-color: #5d5;
+    box-shadow: 1px 1px 1px 0px #3b3;
+    border-radius: 5px;
+
+    /* borders */
+    border-left:  1px solid #3a3;
+    border-top: 1px solid #3a3;
+
+    border-right:  2px solid #3a3;
+    border-bottom:  2px solid #3a3;
+
+    /* text styling */
+    color: white;
+    text-shadow: 1px 1px 1px darkgreen;
+
+    /* paddings */
+    padding: 5px;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+}
+
+.generatedTableButton:hover {
+    background-color: #5c5;
+    border-left:  2px solid #3a3;
+    border-top: 2px solid #3a3;
+
+    border-right:  1px solid #3a3;
+    border-bottom:  1px solid #3a3;
+
+    box-shadow: 1px 1px 0px -2px #3b3;
+    cursor: pointer;
+}

@@ -1,0 +1,10 @@
+C:\xampp\mysql\bin\mysql -u root -p mvc
+
+mysql -u root source, C:\xampp\htdocs\PHP\programming2018\programming\mvc\database_createScript.sql
+mysql -u root -p C:\xampp\htdocs\PHP\programming2018\programming\mvc\database_createScript.sql
+
+-- create database
+mysql -u root -p < C:\xampp\htdocs\PHP\programming2018\programming\mvc\database_createScript.sql
+
+--set user
+mysql -u root -p < C:\xampp\htdocs\PHP\programming2018\programming\mvc\setuser.sql
