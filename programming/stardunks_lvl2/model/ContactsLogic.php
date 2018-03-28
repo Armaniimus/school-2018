@@ -5,6 +5,7 @@ require_once "HtmlElements.php";
 require_once "DataValidator.php";
 
 class ContactsLogic {
+
     private $DataHandler;
     private $HtmlElements;
     private $DataValidator;
@@ -19,7 +20,6 @@ class ContactsLogic {
         $this->DataHandler = NULL;
         $this->DataValidator = NULL;
         $this->HtmlElements = NULL;
-
     }
 
     public function CreateContact() {
@@ -29,6 +29,9 @@ class ContactsLogic {
         $columnNames = $this->DataHandler->GetColumnNames($tablename);
         $columnNames = $this->DataHandler->SelectWithCodeFromArray($columnNames, "02");
 
+        // convert product_price to the right format for the database
+        $_POST["product_price"] = $this->convertNumericData(1, NULL, $_POST["product_price"]);
+
         // run insertQuery
         $this->DataHandler->CreateData(NULL, $tablename, $columnNames, $_POST);
 
@@ -36,10 +39,13 @@ class ContactsLogic {
     }
 
     public function GenerateCreateForm() {
-        $columnNames = $this->DataHandler->GetColumnNames('products');
-        $columnNames = $this->DataHandler->SelectWithCodeFromArray($columnNames, "02");
+        $columnNames =   $this->DataHandler->GetColumnNames("products", "02");
+        $dataTypes =    $this->DataHandler->GetTableTypes("products", 0, "02");
+        $required =     $this->DataHandler->GetTableNullValues("products", 0, "02");
 
-        return $this->HtmlElements->GenerateInputTable($columnNames);
+        $table = $this->HtmlElements->GenerateFormTable($columnNames, $dataTypes, $required, 0);
+
+        return $table;
     }
 
     public function ReadContact($page = 1) {
@@ -53,6 +59,7 @@ class ContactsLogic {
         $returnArray = [];
         $sql = "SELECT * FROM `products` LIMIT $start, 5 ";
         $data = $this->DataHandler->ReadData($sql);
+        $data = $this->convertNumericData(0, $data);
 
         $returnArray[0] = $this->HtmlElements->GenerateButtonedTable($data);
         $returnArray[1] = $this->DataHandler->createPagination("products", 5);
@@ -63,6 +70,7 @@ class ContactsLogic {
     public function ReadSingleContact($id, $option = 0) {
         $sql = "SELECT * FROM `products` WHERE `product_id` = $id";
         $data = $this->DataHandler->ReadData($sql);
+        $data = $this->convertNumericData(0, $data);
 
         if ($option == 0) {
             $data = $this->HtmlElements->GenerateButtonedTable($data);
@@ -73,6 +81,11 @@ class ContactsLogic {
 
     public function UpdateContact() {
         $id = $_POST["product_id"];
+
+        // convert product_price to right format for the database
+        $_POST["product_price"] = $this->convertNumericData(1, NULL, $_POST["product_price"]);
+
+        // set query
         $sql = $this->DataHandler->SetUpdateQuery("products", $_POST);
 
         // run update
@@ -88,15 +101,19 @@ class ContactsLogic {
     public function GenerateUpdateForm() {
         $id = $_GET["id"];
 
-        // get columnNames
-        $columnNames = $this->DataHandler->GetColumnNames("products");
-        $columnNames = $this->DataHandler->SelectWithCodeFromArray($columnNames, "02");
-
         // get data array
         $data = $this->ReadSingleContact($id, 1);
         $data = $data[0];
+        $data["product_price"] = $this->convertNumericData(1, NULL, $data["product_price"]);
 
-        $table = $this->HtmlElements->GenerateUpdateTable($columnNames, $data, $id);
+        // get table generator data
+        $this->DataHandler->SetTableData("products");
+
+        $columnNames = $this->DataHandler->GetColumnNames("products");
+        $dataTypes = $this->DataHandler->GetTableTypes("products", 0);
+        $required = $this->DataHandler->GetTableNullValues("products", 0);
+
+        $table = $this->HtmlElements->GenerateFormTable($columnNames, $dataTypes, $required, $data, 1, $id);
 
         return $table;
     }
@@ -120,6 +137,7 @@ class ContactsLogic {
         $where = $this->DataHandler->SetSearchWhere($search, "products", NULL, 1);
         $sql = $this->DataHandler->SetSearchQuery('products', $search, $limit, NULL, NULL);
         $data = $this->DataHandler->ReadData($sql);
+        $data = $this->convertNumericData(0, $data);
 
         $returnArray[0] = $this->HtmlElements->GenerateButtonedTable($data);
         $returnArray[1] = $this->DataHandler->createPagination("products", 5, $where, "&op=search&search=" . $search );
@@ -143,6 +161,27 @@ class ContactsLogic {
 
         // test and return result
         return $this->DataValidator->LoopCheckNotEmpty($columnNames, $_POST);
+    }
+
+    // $data needs to be an Array for
+    private function convertNumericData($option = 0, $array = NULL, $string = NULL) {
+        if ($option == 0) {
+
+            // Loop and convert all shown data
+            for ($i=0; $i < count($array); $i++) {
+                $array[$i]["product_price"] = "&euro;" . $array[$i]["product_price"];
+                $array[$i]["product_price"] = str_Replace(".", ",", $array[$i]["product_price"]);
+            }
+            return $array;
+
+        } elseif ($option == 1 || $option == "update" || $option == "create") {
+            // $data is a string
+            $string = str_Replace(",", ".", $string);
+            $string = str_Replace("&euro;", "", $string);
+            $string = str_Replace("€", "", $string);
+
+            return $string;
+        }
     }
 }
 

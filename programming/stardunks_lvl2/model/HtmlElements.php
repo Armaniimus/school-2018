@@ -58,118 +58,56 @@ Class HtmlElements {
         return $table;
     }
 
-    private function InputTableHead() {
-        //table Collumn names
+    public function GenerateFormTable($columnNames, $types, $required, $data, $option = 0, $id = NULL) {
+
+        // Set Diffrent options Create and Update
+        if ($option == 0 || $option == "create") {
+            $i = 0;
+            $openingLines = "<form action='index.php?op=create' method='post' >";
+
+            $closingLines = "<button name='addproduct' value='1' class='generatedTableButton' type='submit'>Add product</button>";
+            $closingLines .= "</form>";
+
+        } else if ($option == 1 || $option == "update") {
+            $i = 1;
+            $openingLines = "<form action='index.php?op=update' method='post' >";
+            $openingLines .= "<input type='hidden' name='" . $columnNames[0] . "' value='$id'>";
+
+            $closingLines = "<button name='UpdateSubmit' value='1' class='generatedTableButton' type='submit'>Update</button>";
+            $closingLines .= "</form>";
+        }
+
+        // set head
         $head = "
-            <thead>
+        <thead>
             <tr>
-        ";
-
-        $head .= "
-            <th>CollumnName</th>
-            <th>InputFields</th>
-        ";
-
-        $head .= "
+                <th>ColumnNames</th>
+                <th>InputFields</th>
             </tr>
-            </thead>
-        ";
+        </thead>";
 
-        return $head;
-    }
 
-    private function InputTableBody($columnNames) {
-        //table Body
+        // set Body
         $body = "<tbody>";
-            foreach ($columnNames as $key => $value) {
-                $row = "<tr>";
-
-                $row .= "
-                    <td>$value</td>
-                    <td> <input name='$value'/> </td>
-                ";
-                // break;
-
-                $row .= "</tr>";
-                $body .= $row;
-            }
-
-        $body .= "</tbody>";
-        return $body;
-    }
-
-    public function GenerateInputTable($columnNames) {
-
-        $button = "<button name='addproduct' value='1' class='generatedTableButton' type='submit'>Add product</button>";
-
-        $table = "
-            <form action='index.php?op=create' method='post' >
-                <table border='1' class='generatedTableCreate'>"
-                    . $this->InputTableHead()
-                    . $this->InputTableBody($columnNames)
-                . "</table>"
-                . $button
-            . "</form>
-        ";
-
-        return $table;
-    }
-
-    private function UpdateTableHead() {
-        //table Collumn names
-        $head = "
-            <thead>
+        for ($i; $i<count($columnNames); $i++) {
+            $row = "
             <tr>
-        ";
-
-        $head .= "
-            <th>CollumnName</th>
-            <th>InputFields</th>
-        ";
-
-        $head .= "
-            </tr>
-            </thead>
-        ";
-
-        return $head;
-    }
-
-    private function UpdateTableBody($columnNames, $data) {
-        //table Body
-        $body = "<tbody>";
-            foreach ($columnNames as $key => $value) {
-                $row = "<tr>";
-
-                $row .= "
-                    <td>$value</td>
-                    <td> <input name='$value' value='". $data[$value] ."'/> </td>
-                ";
-
-                $row .= "</tr>";
-                $body .= $row;
-            }
-
+                <td>" . $columnNames[$i] . "</td>
+                <td> <input name='" . $columnNames[$i] . "'" . $types[$i] . " value='". $data[$columnNames[$i]] . "'" . $required[$i] . "/> </td>
+            </tr>";
+            $body .= $row;
+        }
         $body .= "</tbody>";
-        return $body;
-    }
 
-    public function GenerateUpdateTable($columnNames, $data, $id) {
-        // set hidden ID Field update
-        $hiddenField = "<input type='hidden' name='product_id' value='$id'>";
 
-        $button = "<button name='UpdateSubmit' value='1' class='generatedTableButton' type='submit'>Update</button>";
-
-        $table = "
-            <form action='index.php?op=update' method='post' >" .
-                $hiddenField ."
-                <table border='1' class='generatedTableCreate'>"
-                    . $this->UpdateTableHead()
-                    . $this->UpdateTableBody($columnNames, $data)
-                . "</table>"
-                . $button
-            . "</form>
-        ";
+        // Combine the Table
+        $table =
+            $openingLines .
+            "<table border='1' class='generatedTableCreate'>" .
+                $head .
+                $body .
+            "</table>" .
+            $closingLines;
 
         return $table;
     }

@@ -64,8 +64,8 @@ class DataValidator {
     }
 
     private function TestIfBoolean($string) {
-        if ($string == '1' || $string == 1 || $string == TRUE ||
-        $string == '0' || $string == 0 || $string == FALSE) {
+        if ($string == '1' || $string == 1 || $string === TRUE ||
+        $string == '0' || $string == 0 || $string === FALSE) {
             return TRUE;
 
         } else {

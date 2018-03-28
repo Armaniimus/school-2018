@@ -4,8 +4,13 @@
         private $conn;
         public $error;
         public $lastInsertedID;
+        public $dbName;
+        private $tableData;
+
 
         public function __construct($dbName, $username, $pass, $serverAdress, $dbType) {
+            $this->tableData = [];
+            $this->dbName = $dbName;
             $this->conn = new PDO("$dbType:host=$serverAdress;dbname=$dbName", $username, $pass);
 
             // set the PDO error mode to exception
@@ -16,6 +21,8 @@
             $this->conn = NULL;
             $this->error = NULL;
             $this->lastInsertedID = NULL;
+            $this->dbName = NULL;
+            $this->tableData = NULL;
         }
 
         ###################
@@ -95,6 +102,10 @@
             }
 
             // requires ($updateQuery) or ($tableName + $AssocArray + $idValue + $idName)
+
+            // string variables -> $updateQuery $tableName $idName
+            // int variables -> $idValue
+            // array variables -> $AssocArray
             public function UpdateData($updateQuery = NULL, $tableName = NULL, $AssocArray = NULL, $idValue = NULL, $idName = "id") {
 
                 if ($updateQuery == NULL) {
@@ -138,58 +149,43 @@
         ##################
         # HelperFunctions
         ##################
+            /****
+            ** description -> Gets critical tabledata
+            ** relies on methods -> RunSqlQuery()
 
-            // returns a 2dimensional assoc array
-            public function GetColumnNames($tablename) {
-                try {
-                    $localConn = $this->conn->prepare("SELECT * FROM $tablename LIMIT 0, 1");
-                    $localConn->execute();
-                    $queryRes = $localConn->fetch(PDO::FETCH_ASSOC);
+            ** Requires -> $tablename
+            ** string variables -> $tablename
+            ****/
+            private function SetTableData($tablename) {
+                // test if data is set Allready
+                if (
+                    !isset($this->tableData[$tablename]["columnNames"]) &&
+                    !isset($this->tableData[$tablename]["typeValues"]) &&
+                    !isset($this->tableData[$tablename]["nullValues"])
 
-                } catch(PDOException $e) {
-                    throw new Exception("TABLENAME: $tablename ERROR: ". $e->getMessage() );
+                // if not set run this query
+                ) {
+                    // run Query
+                    $getDataQuery = "show Fields FROM $tablename";
+                    $queryRes = $this->RunSqlQuery($getDataQuery, 1);
+
+                    // Set variables
+                    for ($i=0; $i<count($queryRes); $i++) {
+                        $this->tableData[$tablename]["columnNames"][$i] = $queryRes[$i]["Field"];
+                        $this->tableData[$tablename]["typeValues"][$i] = $queryRes[$i]["Type"];
+                        $this->tableData[$tablename]["nullValues"][$i] = $queryRes[$i]["Null"];
+                    }
                 }
-
-                $data = [];
-                $i = 0;
-                foreach ($queryRes as $key => $value) {
-                    $data[$i] = $key;
-                    $i++;
-                }
-
-                return $data;
             }
 
-            public function SelectWithCodeFromArray($array, $code) {
-                $splittedCode = str_split($code);
-                $return = []; // <--- is used to store the output data
-                $y=0; // <--- is used to count in which position the next datapiece needs to go
+            /****
+            ** description -> run a pdo database query
+            ** relies on methods -> Null
 
-                for ($i=0; $i<count($array); $i++) {
-                    if ($splittedCode[$i] == 0) {
-
-                    }
-                    else if ($splittedCode[$i] == 1) {
-                        $return[$y] = $array[$i];
-                        $y++;
-                    }
-                    else if ($splittedCode[$i] == 2) {
-                        //runs till the end of the array and writes everything inside the array
-                        for ($i=$i; $i<count($array); $i++) {
-                            $return[$y] = $array[$i];
-                            $y++;
-                        }
-                    }
-                    else if ($splittedCode[$i] == 3) {
-                        //runs till the end of the array and writes nothings
-                        for ($i=$i; $i<count($array); $i++) {
-
-                        }
-                    }
-                }
-                return $return;
-            }
-
+            ** Requires -> $sqlQuery $option
+            ** string variables -> $sqlQuery
+            ** int variables -> $option
+            ****/
             private function RunSqlQuery($sqlQuery, $option = 0) {
 
                 try {
@@ -226,16 +222,15 @@
                 return $return;
             }
 
-            /* extract only specified data from the assoc array
-            ** and convert assoc array to Numb array */
-            private function ExtractData($inputColumnNames, $inputAssocArray) {
-                $sqlNumberedArray = [];
-                for ($i=0; $i<count($inputColumnNames); $i++) {
-                    $sqlNumberedArray[$i] = $inputAssocArray[$inputColumnNames[$i] ];
-                }
-                return $sqlNumberedArray;
-            }
+            /****
+            ** description -> Sets insert data for the create query or set data for the updateQuery
+            ** relies on methods -> Null
 
+            ** Requires -> $colNames_nrArr, $AssocArray, $option
+            ** assocArray variables -> $AssocArray
+            ** nrArray variables -> $colNames_nrArr
+            ** int variables -> $option
+            ****/
             private function SetRecordData_Assoc($colNames_nrArr, $AssocArray, $option) {
 
                 // Generate Set part for the update
@@ -258,6 +253,13 @@
                 return $recordData;
             }
 
+            /****
+            ** description -> sets the column names for the SELECT or UPDATE part in a query
+            ** relies on methods -> Null
+
+            ** Requires -> $Nr_Arr_ColNames
+            ** nrArray variables -> $Nr_Arr_ColNames
+            ****/
             private function GenerateSqlColumnNames($Nr_Arr_ColNames) {
                 //Generates $sqlColumnNames
                 $sqlColumnNames = $Nr_Arr_ColNames[0];
@@ -266,6 +268,149 @@
                 }
                 return $sqlColumnNames;
             }
+
+
+            /****
+            ** description -> Selects specified data from an array
+            ** relies on methods -> Null
+
+            ** Requires -> $array, $code
+            ** string variables -> $code
+            ** array variables -> $array
+            ****/
+            public function SelectWithCodeFromArray($array, $code) {
+                $splittedCode = str_split($code);
+                $return = []; // <--- is used to store the output data
+                $y=0; // <--- is used to count in which position the next datapiece needs to go
+
+                for ($i=0; $i<count($array); $i++) {
+                    if ($splittedCode[$i] == 0) {
+
+                    }
+                    else if ($splittedCode[$i] == 1) {
+                        $return[$y] = $array[$i];
+                        $y++;
+                    }
+                    else if ($splittedCode[$i] == 2) {
+                        //runs till the end of the array and writes everything inside the array
+                        for ($i=$i; $i<count($array); $i++) {
+                            $return[$y] = $array[$i];
+                            $y++;
+                        }
+                    }
+                    else if ($splittedCode[$i] == 3) {
+                        //runs till the end of the array and writes nothings
+                        for ($i=$i; $i<count($array); $i++) {
+
+                        }
+                    }
+                }
+                return $return;
+            }
+
+            /****
+            ** description -> Gets tableTypes from the database
+            ** relies on methods -> SetTableData() SelectWithCodeFromArray()
+
+            ** Requires -> $tablename, $option
+            ** Optional -> $selectionCode -> used to select only certaint fields from the array
+            ** string variables -> $tablename $selectionCode
+            ** int variables -> $option
+            **
+            ** global variables -> tableData[$tablename][typeValues] -> this gets set by SetTableData if not set allready
+            ****/
+            public function GetTableTypes($tablename, $option = 0, $selectionCode = NULL) {
+                if (!isset($this->tableData[$tablename]["typeValues"]) ) {
+                    $this->SetTableData($tablename);
+                }
+
+                $data = $this->tableData[$tablename]["typeValues"];
+
+                // return Html Validation shizzle
+                if ($option == 0) {
+                    for ($i=0; $i<count($data); $i++) {
+                         if (strpos($data[$i], 'int') !== false) {
+                            $data[$i] = "type='number' step='1'";
+
+                        } else if (strpos($data[$i], 'varchar') !== false) {
+                            $data[$i] = "type='text'";
+
+                        } else if (strpos($data[$i], 'decimal') !== false) {
+                            $data[$i] = "type='number' step='any'";
+                        }
+                    }
+                }
+
+                if ($selectionCode !== NULL) {
+                    $data = $this->SelectWithCodeFromArray($data, $selectionCode);
+                }
+
+                return $data;
+            }
+
+
+            /****
+            ** description -> Gets from the database what fields cannot be null
+            ** relies on methods -> SetTableData() SelectWithCodeFromArray()
+
+            ** Requires -> $tablename, $option
+            ** Optional -> $selectionCode -> used to select only certaint fields from the array
+            ** string variables -> $tablename $selectionCode
+            ** int variables -> $option
+            **
+            ** global variables -> tableData[$tablename][typeValues] -> this gets set by SetTableData if not set allready
+            ****/
+            public function GetTableNullValues($tablename, $option = 0, $selectionCode = NULL) {
+                if (!isset($this->tableData[$tablename]["nullValues"]) ) {
+                    $this->SetTableData($tablename);
+                }
+
+                $data = $this->tableData[$tablename]["nullValues"];
+
+                // return Html validation Shizzle
+                if ($option == 0) {
+                    for ($i=0; $i < count($data); $i++) {
+                        if (strpos($data[$i], 'YES') !== false) {
+                            $data[$i] = "";
+
+                        } else if (strpos($data[$i], 'NO') !== false) {
+                            $data[$i] = "required";
+                        }
+                    }
+                }
+
+                if ($selectionCode !== NULL) {
+                    $data = $this->SelectWithCodeFromArray($data, $selectionCode);
+                }
+
+                return $data;
+            }
+
+
+            /****
+            ** description -> Gets tableTypes from the database
+            ** relies on methods -> SetTableData() SelectWithCodeFromArray()
+
+            ** Requires -> $tablename, $option
+            ** Optional -> $selectionCode -> used to select only certaint fields from the array
+            ** string variables -> $tablename $selectionCode
+            ** int variables -> $option
+            **
+            ** global variables -> tableData[$tablename][typeValues] -> this gets set by SetTableData if not set allready
+            ****/
+            public function GetColumnNames($tablename, $selectionCode = NULL) {
+                if (!isset($this->tableData[$tablename]["columnNames"]) ) {
+                    $this->SetTableData($tablename);
+                }
+                $columnNames = $this->tableData[$tablename]["columnNames"];
+
+                if ($selectionCode !== NULL) {
+                    $columnNames = $this->SelectWithCodeFromArray($columnNames, $selectionCode);
+                }
+
+                return $columnNames;
+            }
+
         #### end of HelperFunctions
 
         ########################
@@ -378,6 +523,7 @@
             public function createPagination($tablename, $resAmountPerPage, $where = "", $optional = "") {
                 $totalItems = $this->CountDataResults($tablename, $where);
 
+                // Set total pagination numbers
                 $restItems = $totalItems % $resAmountPerPage;
                 $totalPagination = floor($totalItems / $resAmountPerPage);
 
