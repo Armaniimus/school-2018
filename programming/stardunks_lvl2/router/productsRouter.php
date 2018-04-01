@@ -1,11 +1,11 @@
 <?php
 
-class ContactsRouter {
+class ProductsRouter {
     private $controller;
 
     public function __Construct() {
-        require_once 'controller/c_ContactsController.php';
-        $this->controller = new ContactsController("stardunks", "root", "");
+        require_once 'controller/productsController.php';
+        $this->controller = new ProductsController("stardunks", "root", "");
     }
 
     public function __Destruct() {
@@ -23,26 +23,26 @@ class ContactsRouter {
 
         switch ($op) {
             case 'create':
-                $this->controller->collectCreateContacts();
+                $this->controller->collectCreateProducts();
                 break;
 
             case 'update':
-                $this->controller->collectUpdateContact();
+                $this->controller->collectUpdateProduct();
                 break;
 
             case 'delete':
                 if (isset($_GET['id']) ) {
                     $id = $_GET['id'];
-                    $this->controller->collectDeleteContacts($id);
+                    $this->controller->collectDeleteProducts($id);
                 }
                 break;
 
             case 'search':
-                $this->controller->collectSearchContacts();
+                $this->controller->collectSearchProducts();
                 break;
 
             default:
-                $this->controller->collectReadContacts();
+                $this->controller->collectReadProducts();
                 break;
         }
     }

@@ -1,46 +1,46 @@
 <?php
 
-require_once 'model/ContactsLogic.php';
+require_once 'model/ProductsLogic.php';
 
-class ContactsController {
-    private $ContactsLogic;
+class ProductsController {
+    private $ProductsLogic;
 
     public function __Construct($dbName, $username, $pass, $serverAdress = "localhost", $dbType = "mysql" ) {
-        $this->ContactsLogic = new ContactsLogic($dbName, $username, $pass, $serverAdress, $dbType);
+        $this->ProductsLogic = new ProductsLogic($dbName, $username, $pass, $serverAdress, $dbType);
     }
 
     public function __Destruct() {
-        $this->ContactsLogic = NULL;
+        $this->ProductsLogic = NULL;
     }
 
     // data gets extracted from the $_POST
-    public function collectCreateContacts() {
-        if ($this->ContactsLogic->TestDataSubmitted(1) ) {
+    public function collectCreateProducts() {
+        if ($this->ProductsLogic->TestDataSubmitted(1) ) {
 
             // sumbit the form
-            $lastID = $this->ContactsLogic->CreateContact();
+            $lastID = $this->ProductsLogic->CreateProduct();
 
             // run a read
-            $this->collectSingleReadContact($lastID);
+            $this->collectSingleReadProduct($lastID);
         } else {
             // Show the form
-            $content = $this->ContactsLogic->GenerateCreateForm();
+            $content = $this->ProductsLogic->GenerateCreateForm();
             require_once 'view/create.php';
         }
     }
 
-    public function collectReadContacts() {
+    public function collectReadProducts() {
         // run the read
         if ( !empty($_GET["id"] ) && $_GET["id"] > -1 ) {
 
-            $content = $this->ContactsLogic->ReadSingleContact($_GET["id"]);
+            $content = $this->ProductsLogic->ReadSingleProduct($_GET["id"]);
             require_once 'view/readSingle.php';
 
         } else {
             if ( !isset($_GET["page"]) ) {
                 $_GET["page"] = "";
             }
-            $returnedArray = $this->ContactsLogic->ReadContact($_GET["page"]);
+            $returnedArray = $this->ProductsLogic->ReadProduct($_GET["page"]);
 
             $content = $returnedArray[0];
             $pagination = $returnedArray[1];
@@ -49,20 +49,20 @@ class ContactsController {
         }
     }
 
-    private function collectSingleReadContact($id) {
+    private function collectSingleReadProduct($id) {
         // run singleRead
-        $content = $this->ContactsLogic->ReadSingleContact($id);
+        $content = $this->ProductsLogic->ReadSingleProduct($id);
         require_once 'view/readSingle.php';
     }
 
     // not done
-    public function collectUpdateContact() {
+    public function collectUpdateProduct() {
 
         // check if Data is submitted
-        if ($this->ContactsLogic->TestDataSubmitted() ) {
+        if ($this->ProductsLogic->TestDataSubmitted() ) {
 
             // Run the update
-            $content = $this->ContactsLogic->UpdateContact();
+            $content = $this->ProductsLogic->UpdateProduct();
             require_once 'view/readSingle.php';
 
         // Check if There is an Id in the url
@@ -71,26 +71,26 @@ class ContactsController {
             $id = $_GET['id'];
 
             // Show the form
-            $content = $this->ContactsLogic->GenerateUpdateForm($id);
+            $content = $this->ProductsLogic->GenerateUpdateForm($id);
             require_once 'view/update.php';
 
         } else {
             // run a regular read
             $_GET["id"] = -1;
-            $this->collectReadContacts();
+            $this->collectReadProducts();
         }
     }
 
-    public function collectDeleteContacts($id) {
+    public function collectDeleteProducts($id) {
         // Run Delete
-        $result = $this->ContactsLogic->DeleteContact($id);
+        $result = $this->ProductsLogic->DeleteProduct($id);
 
         // run Read
         $_GET["id"] = -1;
-        $this->collectReadContacts();
+        $this->collectReadProducts();
     }
 
-    public function collectSearchContacts() {
+    public function collectSearchProducts() {
 
         if (isset($_REQUEST["search"]) ) {
             if (isset($_GET["page"]) ) {
@@ -100,7 +100,7 @@ class ContactsController {
             }
 
             $search = $_REQUEST["search"];
-            $returnedArray = $this->ContactsLogic->SearchContact($search, $page);
+            $returnedArray = $this->ProductsLogic->SearchProduct($search, $page);
 
             $content = $returnedArray[0];
             $pagination = $returnedArray[1];
@@ -108,7 +108,7 @@ class ContactsController {
             require_once 'view/readSingle.php';
 
         } else {
-            $this->collectReadContacts();
+            $this->collectReadProducts();
         }
     }
 }

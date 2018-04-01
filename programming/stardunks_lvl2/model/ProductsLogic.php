@@ -4,7 +4,7 @@ require_once "DataHandler.php";
 require_once "HtmlElements.php";
 require_once "DataValidator.php";
 
-class ContactsLogic {
+class ProductsLogic {
 
     private $DataHandler;
     private $HtmlElements;
@@ -22,7 +22,7 @@ class ContactsLogic {
         $this->HtmlElements = NULL;
     }
 
-    public function CreateContact() {
+    public function CreateProduct() {
         $tablename = "products";
 
         // set and select collumnNames
@@ -30,7 +30,7 @@ class ContactsLogic {
         $columnNames = $this->DataHandler->SelectWithCodeFromArray($columnNames, "02");
 
         // convert product_price to the right format for the database
-        $_POST["product_price"] = $this->convertNumericData(1, NULL, $_POST["product_price"]);
+        $_POST["product_price"] = $this->ConvertNumericData(1, NULL, $_POST["product_price"]);
 
         // run insertQuery
         $this->DataHandler->CreateData(NULL, $tablename, $columnNames, $_POST);
@@ -48,7 +48,7 @@ class ContactsLogic {
         return $table;
     }
 
-    public function ReadContact($page = 1) {
+    public function ReadProduct($page = 1) {
         if ($page > 0) {
             $page--;
         } else {
@@ -58,19 +58,22 @@ class ContactsLogic {
 
         $returnArray = [];
         $sql = "SELECT * FROM `products` LIMIT $start, 5 ";
+
+
+        // Create a second Method *** NOT DRY
         $data = $this->DataHandler->ReadData($sql);
-        $data = $this->convertNumericData(0, $data);
+        $data = $this->ConvertNumericData(0, $data);
 
         $returnArray[0] = $this->HtmlElements->GenerateButtonedTable($data);
-        $returnArray[1] = $this->DataHandler->createPagination("products", 5);
+        $returnArray[1] = $this->DataHandler->CreatePagination("products", 5);
 
         return $returnArray;
     }
 
-    public function ReadSingleContact($id, $option = 0) {
+    public function ReadSingleProduct($id, $option = 0) {
         $sql = "SELECT * FROM `products` WHERE `product_id` = $id";
         $data = $this->DataHandler->ReadData($sql);
-        $data = $this->convertNumericData(0, $data);
+        $data = $this->ConvertNumericData(0, $data);
 
         if ($option == 0) {
             $data = $this->HtmlElements->GenerateButtonedTable($data);
@@ -79,11 +82,11 @@ class ContactsLogic {
         return $data;
     }
 
-    public function UpdateContact() {
+    public function UpdateProduct() {
         $id = $_POST["product_id"];
 
         // convert product_price to right format for the database
-        $_POST["product_price"] = $this->convertNumericData(1, NULL, $_POST["product_price"]);
+        $_POST["product_price"] = $this->ConvertNumericData(1, NULL, $_POST["product_price"]);
 
         // set query
         $sql = $this->DataHandler->SetUpdateQuery("products", $_POST);
@@ -92,7 +95,7 @@ class ContactsLogic {
         $this->DataHandler->UpdateData($sql);
 
         // Get resulting row
-        $data = $this->ReadSingleContact($id, 1);
+        $data = $this->ReadSingleProduct($id, 1);
 
         // format and return
         return $this->HtmlElements->GenerateButtonedTable($data);
@@ -102,13 +105,11 @@ class ContactsLogic {
         $id = $_GET["id"];
 
         // get data array
-        $data = $this->ReadSingleContact($id, 1);
+        $data = $this->ReadSingleProduct($id, 1);
         $data = $data[0];
-        $data["product_price"] = $this->convertNumericData(1, NULL, $data["product_price"]);
+        $data["product_price"] = $this->ConvertNumericData(1, NULL, $data["product_price"]);
 
-        // get table generator data
-        $this->DataHandler->SetTableData("products");
-
+        // get table data
         $columnNames = $this->DataHandler->GetColumnNames("products");
         $dataTypes = $this->DataHandler->GetTableTypes("products", 0);
         $required = $this->DataHandler->GetTableNullValues("products", 0);
@@ -118,12 +119,12 @@ class ContactsLogic {
         return $table;
     }
 
-    public function DeleteContact($id) {
+    public function DeleteProduct($id) {
         $sql = "DELETE FROM `products` WHERE `product_id` = $id";
         return $this->DataHandler->DeleteData($sql);
     }
 
-    public function SearchContact($search, $page = 1) {
+    public function SearchProduct($search, $page = 1) {
         if ($page > 0) {
             $page--;
         } else {
@@ -136,11 +137,13 @@ class ContactsLogic {
 
         $where = $this->DataHandler->SetSearchWhere($search, "products", NULL, 1);
         $sql = $this->DataHandler->SetSearchQuery('products', $search, $limit, NULL, NULL);
+
+        // Create a second Method *** NOT DRY
         $data = $this->DataHandler->ReadData($sql);
-        $data = $this->convertNumericData(0, $data);
+        $data = $this->ConvertNumericData(0, $data);
 
         $returnArray[0] = $this->HtmlElements->GenerateButtonedTable($data);
-        $returnArray[1] = $this->DataHandler->createPagination("products", 5, $where, "&op=search&search=" . $search );
+        $returnArray[1] = $this->DataHandler->CreatePagination("products", 5, $where, "&op=search&search=" . $search );
 
         return $returnArray;
     }
@@ -164,7 +167,7 @@ class ContactsLogic {
     }
 
     // $data needs to be an Array for
-    private function convertNumericData($option = 0, $array = NULL, $string = NULL) {
+    private function ConvertNumericData($option = 0, $array = NULL, $string = NULL) {
         if ($option == 0) {
 
             // Loop and convert all shown data

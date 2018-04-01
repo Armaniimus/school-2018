@@ -157,15 +157,24 @@
             ** string variables -> $tablename
             ****/
             private function SetTableData($tablename) {
-                // run Query
-                $getDataQuery = "show Fields FROM $tablename";
-                $queryRes = $this->RunSqlQuery($getDataQuery, 1);
+                // test if data is set Allready
+                if (
+                    !isset($this->tableData[$tablename]["columnNames"]) &&
+                    !isset($this->tableData[$tablename]["typeValues"]) &&
+                    !isset($this->tableData[$tablename]["nullValues"])
 
-                // Set variables
-                for ($i=0; $i<count($queryRes); $i++) {
-                    $this->tableData[$tablename]["columnNames"][$i] = $queryRes[$i]["Field"];
-                    $this->tableData[$tablename]["typeValues"][$i] = $queryRes[$i]["Type"];
-                    $this->tableData[$tablename]["nullValues"][$i] = $queryRes[$i]["Null"];
+                // if not set run this query
+                ) {
+                    // run Query
+                    $getDataQuery = "show Fields FROM $tablename";
+                    $queryRes = $this->RunSqlQuery($getDataQuery, 1);
+
+                    // Set variables
+                    for ($i=0; $i<count($queryRes); $i++) {
+                        $this->tableData[$tablename]["columnNames"][$i] = $queryRes[$i]["Field"];
+                        $this->tableData[$tablename]["typeValues"][$i] = $queryRes[$i]["Type"];
+                        $this->tableData[$tablename]["nullValues"][$i] = $queryRes[$i]["Null"];
+                    }
                 }
             }
 
@@ -511,7 +520,7 @@
                 return $sql;
             }
 
-            public function CreatePagination($tablename, $resAmountPerPage, $where = "", $optional = "") {
+            public function createPagination($tablename, $resAmountPerPage, $where = "", $optional = "") {
                 $totalItems = $this->CountDataResults($tablename, $where);
 
                 // Set total pagination numbers
