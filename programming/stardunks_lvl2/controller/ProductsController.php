@@ -13,6 +13,41 @@ class ProductsController {
         $this->ProductsLogic = NULL;
     }
 
+    public function handleRequest() {
+
+        if (isset($_GET['op']) ) {
+            $op = $_GET['op'];
+
+        } else {
+            $op = "";
+        }
+
+        switch ($op) {
+            case 'create':
+                $this->collectCreateProducts();
+                break;
+
+            case 'update':
+                $this->collectUpdateProduct();
+                break;
+
+            case 'delete':
+                if (isset($_GET['id']) ) {
+                    $id = $_GET['id'];
+                    $this->collectDeleteProducts($id);
+                }
+                break;
+
+            case 'search':
+                $this->collectSearchProducts();
+                break;
+
+            default:
+                $this->collectReadProducts();
+                break;
+        }
+    }
+
     // data gets extracted from the $_POST
     public function collectCreateProducts() {
         if ($this->ProductsLogic->TestDataSubmitted(1) ) {
@@ -49,18 +84,17 @@ class ProductsController {
         }
     }
 
-    private function collectSingleReadProduct($id) {
-        // run singleRead
-        $content = $this->ProductsLogic->ReadSingleProduct($id);
-        require_once 'view/readSingle.php';
-    }
+    // private function collectSingleReadProduct($id) {
+    //     // run singleRead
+    //     $content = $this->ProductsLogic->ReadSingleProduct($id);
+    //     require_once 'view/readSingle.php';
+    // }
 
     // not done
     public function collectUpdateProduct() {
 
         // check if Data is submitted
         if ($this->ProductsLogic->TestDataSubmitted() ) {
-
             // Run the update
             $content = $this->ProductsLogic->UpdateProduct();
             require_once 'view/readSingle.php';

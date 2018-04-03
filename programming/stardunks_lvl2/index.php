@@ -16,9 +16,9 @@
 
 
 <?php
-require_once 'router/productsRouter.php';
-$request = new productsRouter();
-$request->handleRequest();
+require_once 'controller/ProductsController.php';
+$productsController = new ProductsController("stardunks", "root", "");
+$productsController->handleRequest();
 
 ?>
 </body>

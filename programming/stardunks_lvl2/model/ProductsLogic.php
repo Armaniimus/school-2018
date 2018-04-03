@@ -39,11 +39,12 @@ class ProductsLogic {
     }
 
     public function GenerateCreateForm() {
-        $columnNames =   $this->DataHandler->GetColumnNames("products", "02");
-        $dataTypes =    $this->DataHandler->GetTableTypes("products", 0, "02");
-        $required =     $this->DataHandler->GetTableNullValues("products", 0, "02");
+        $columnNames =  $this->DataHandler->GetColumnNames("products");
+        $dataTypes =    $this->DataHandler->GetTableTypes("products", 0);
+        $required =     $this->DataHandler->GetTableNullValues("products", 0);
 
-        $table = $this->HtmlElements->GenerateFormTable($columnNames, $dataTypes, $required, 0);
+        // $table = $this->HtmlElements->GenerateFormTable($columnNames, $dataTypes, $required, 0);
+        $table = $this->HtmlElements->GenerateForm('post', 'index.php?op=create', "createForm", null, $columnNames, $dataTypes, $required, 1);
 
         return $table;
     }
@@ -59,12 +60,7 @@ class ProductsLogic {
         $returnArray = [];
         $sql = "SELECT * FROM `products` LIMIT $start, 5 ";
 
-
-        // Create a second Method *** NOT DRY
-        $data = $this->DataHandler->ReadData($sql);
-        $data = $this->ConvertNumericData(0, $data);
-
-        $returnArray[0] = $this->HtmlElements->GenerateButtonedTable($data);
+        $returnArray[0] = $this->GetData($sql);
         $returnArray[1] = $this->DataHandler->CreatePagination("products", 5);
 
         return $returnArray;
@@ -76,7 +72,8 @@ class ProductsLogic {
         $data = $this->ConvertNumericData(0, $data);
 
         if ($option == 0) {
-            $data = $this->HtmlElements->GenerateButtonedTable($data);
+            $buttonArray = $this->TableButtons($data, "generatedTable");
+            return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", 2, $buttonArray, "actions");
         }
 
         return $data;
@@ -98,7 +95,27 @@ class ProductsLogic {
         $data = $this->ReadSingleProduct($id, 1);
 
         // format and return
-        return $this->HtmlElements->GenerateButtonedTable($data);
+        $buttonArray = $this->TableButtons($data, "generatedTable");
+        return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", 2, $buttonArray, "actions");
+    }
+
+    private function TableButtons($data, $tablename, $idName = "product_id") {
+        $buttonsArray = [];
+
+        $returnArray = [];
+        $i=0;
+        foreach ($data as $key => $value) {
+
+            $id = $value[$idName];
+            $buttonsArray[0] = "<td class='button $tablename--buttons' style='min-width: 85px'> <a href='index.php?id=$id&op=read'    class='generatedTableButton' style='min-width:100%'> <i class='fas fa-book buttonIconColor'></i>  Read   </a></td>";
+            $buttonsArray[1] = "<td class='button $tablename--buttons' style='min-width: 85px'> <a href='index.php?id=$id&op=update'  class='generatedTableButton' style='min-width:100%'> <i class='fas fa-edit buttonIconColor'></i>  Update </a></td>";
+            $buttonsArray[2] = "<td class='button $tablename--buttons' style='min-width: 85px'> <a href='index.php?id=$id&op=delete'  class='generatedTableButton' style='min-width:100%'> <i class='fas fa-trash buttonIconColor'></i> Delete </a></td>";
+
+            $returnArray[$i] = $buttonsArray;
+
+            $i++;
+        }
+        return $returnArray;
     }
 
     public function GenerateUpdateForm() {
@@ -109,12 +126,13 @@ class ProductsLogic {
         $data = $data[0];
         $data["product_price"] = $this->ConvertNumericData(1, NULL, $data["product_price"]);
 
-        // get table data
+        // get other table data
         $columnNames = $this->DataHandler->GetColumnNames("products");
         $dataTypes = $this->DataHandler->GetTableTypes("products", 0);
         $required = $this->DataHandler->GetTableNullValues("products", 0);
 
-        $table = $this->HtmlElements->GenerateFormTable($columnNames, $dataTypes, $required, $data, 1, $id);
+        // run the query
+        $table = $this->HtmlElements->GenerateForm('post', 'index.php?op=update', "updateForm", $data, $columnNames, $dataTypes, $required, 0);
 
         return $table;
     }
@@ -138,14 +156,18 @@ class ProductsLogic {
         $where = $this->DataHandler->SetSearchWhere($search, "products", NULL, 1);
         $sql = $this->DataHandler->SetSearchQuery('products', $search, $limit, NULL, NULL);
 
-        // Create a second Method *** NOT DRY
-        $data = $this->DataHandler->ReadData($sql);
-        $data = $this->ConvertNumericData(0, $data);
-
-        $returnArray[0] = $this->HtmlElements->GenerateButtonedTable($data);
+        $returnArray[0] = $this->GetData($sql);
         $returnArray[1] = $this->DataHandler->CreatePagination("products", 5, $where, "&op=search&search=" . $search );
 
         return $returnArray;
+    }
+
+    private function GetData($sql) {
+        $data = $this->DataHandler->ReadData($sql);
+        $data = $this->ConvertNumericData(0, $data);
+
+        $buttonArray = $this->TableButtons($data, "generatedTable");
+        return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", 2, $buttonArray, "actions");
     }
 
     public function TestDataSubmitted($option = 0) {
@@ -158,7 +180,7 @@ class ProductsLogic {
         $columnNames = $this->DataHandler->GetColumnNames('products');
 
         // if Fit the Array to the selected option
-        if ($option == 1 || $option == "Create") {
+        if ($option === 1 || $option === "Create") {
             $columnNames = $this->DataHandler->SelectWithCodeFromArray($columnNames, "02");
         }
 
