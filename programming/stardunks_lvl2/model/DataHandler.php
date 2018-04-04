@@ -310,58 +310,11 @@
             **
             ** global variables -> tableData[$tablename][typeValues] -> this gets set by SetTableData if not set allready
             ****/
-            public function GetTableTypes($tablename, $option = 0, $selectionCode = NULL) {
+            public function GetTableTypes($tablename, $selectionCode = NULL) {
                 if (!isset($this->tableData[$tablename]["typeValues"]) ) {
                     $this->SetTableData($tablename);
                 }
-
                 $data = $this->tableData[$tablename]["typeValues"];
-
-                // return Html Validation shizzle
-                if ($option == 0) {
-                    for ($i=0; $i<count($data); $i++) {
-                        if (strpos($data[$i], 'int') !== false) {
-
-                            if (strpos($data[$i], 'unsigned') !== false){
-                                $max = 4294967295;
-                                $min = 0;
-                            } else {
-                                $max = 	2147483647;
-                                $min = -2147483648;
-                            }
-                            $data[$i] = "type='number' step='1' min='$min' max='$max'";
-
-                        } else if (strpos($data[$i], 'varchar') !== false) {
-                            $data[$i] = str_replace("varchar(", "", $data[$i]);
-                            $data[$i] = str_replace(")", "", $data[$i]);
-                            $data[$i] = "type='text' maxlength=" . $data[$i];
-
-                        } else if ( (strpos($data[$i], 'decimal') !== false) || (strpos($data[$i], 'float') !== false) || (strpos($data[$i], 'double') !== false) ) {
-                            // get numericData
-                            $data[$i] = str_replace("decimal(", "", $data[$i]);
-                            $data[$i] = str_replace("float(", "", $data[$i]);
-                            $data[$i] = str_replace("double(", "", $data[$i]);
-                            $data[$i] = str_replace(")", "", $data[$i]);
-                            $splittedData = explode(",", $data[$i]);
-
-                            // set decimal
-                            $x=1;
-                            for ($i2=0; $i2 < $splittedData[1] ; $i2++) {
-                                $decimal = ($x = $x / 10);
-                            }
-
-                            // set max
-                            $multiplier = $splittedData[0]-$splittedData[1];
-                            $x=1;
-                            for ($i2=0; $i2 < $multiplier; $i2++) {
-                                $max = $x = 10 * $x;
-                            }
-                            $max = $max - $decimal;
-
-                            $data[$i] = "type='number' max='$max' step='$decimal'";
-                        }
-                    }
-                }
 
                 if ($selectionCode !== NULL) {
                     $data = $this->SelectWithCodeFromArray($data, $selectionCode);
@@ -369,7 +322,6 @@
 
                 return $data;
             }
-
 
             /****
             ** description -> Gets from the database what fields cannot be null
@@ -382,24 +334,12 @@
             **
             ** global variables -> tableData[$tablename][typeValues] -> this gets set by SetTableData if not set allready
             ****/
-            public function GetTableNullValues($tablename, $option = 0, $selectionCode = NULL) {
+            public function GetTableNullValues($tablename, $selectionCode = NULL) {
                 if (!isset($this->tableData[$tablename]["nullValues"]) ) {
                     $this->SetTableData($tablename);
                 }
 
                 $data = $this->tableData[$tablename]["nullValues"];
-
-                // return Html validation Shizzle
-                if ($option == 0) {
-                    for ($i=0; $i < count($data); $i++) {
-                        if (strpos($data[$i], 'YES') !== false) {
-                            $data[$i] = "";
-
-                        } else if (strpos($data[$i], 'NO') !== false) {
-                            $data[$i] = "required";
-                        }
-                    }
-                }
 
                 if ($selectionCode !== NULL) {
                     $data = $this->SelectWithCodeFromArray($data, $selectionCode);

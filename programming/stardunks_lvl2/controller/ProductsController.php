@@ -56,7 +56,8 @@ class ProductsController {
             $lastID = $this->ProductsLogic->CreateProduct();
 
             // run a read
-            $this->collectSingleReadProduct($lastID);
+            $_GET["id"] = $lastID;
+            $this->collectReadProducts();
         } else {
             // Show the form
             $content = $this->ProductsLogic->GenerateCreateForm();
@@ -100,9 +101,16 @@ class ProductsController {
             require_once 'view/readSingle.php';
 
         // Check if There is an Id in the url
-        } else if ( isset($_GET["id"]) ) {
+    } else if ( isset($_GET["id"]) || isset($_POST['product_id']) ) {
             // Set the id
-            $id = $_GET['id'];
+            if (isset($_GET["id"]) ) {
+                $id = $_GET['id'];
+            }
+
+            // if form is incorrectly filled set the id to post id
+            else {
+                $id = $_POST['product_id'];
+            }
 
             // Show the form
             $content = $this->ProductsLogic->GenerateUpdateForm($id);

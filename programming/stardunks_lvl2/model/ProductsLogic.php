@@ -12,7 +12,13 @@ class ProductsLogic {
 
     public function __construct($dbName, $username, $pass, $serverAdress, $dbType) {
         $this->DataHandler = new DataHandler($dbName, $username, $pass, $serverAdress, $dbType);
-        $this->DataValidator = new DataValidator();
+
+        $columnNames =  $this->DataHandler->GetColumnNames("products");
+        $dataTypes =    $this->DataHandler->GetTableTypes("products");
+        $dataNullArray = $this->DataHandler->GetTableNullValues("products");
+
+        $this->DataValidator = new DataValidator($columnNames, $dataTypes, $dataNullArray);
+
         $this->HtmlElements = new HtmlElements();
     }
 
@@ -40,11 +46,14 @@ class ProductsLogic {
 
     public function GenerateCreateForm() {
         $columnNames =  $this->DataHandler->GetColumnNames("products");
-        $dataTypes =    $this->DataHandler->GetTableTypes("products", 0);
-        $required =     $this->DataHandler->GetTableNullValues("products", 0);
+        $dataTypes =    $this->DataHandler->GetTableTypes("products");
+        // GetHtmlValidateData($dataTypesArray)
+
+        $htmlTypes =    $this->DataValidator->GetHtmlValidateData($dataTypes);
+        $required =     $this->DataValidator->ValidateHTMLNotNull();
 
         // $table = $this->HtmlElements->GenerateFormTable($columnNames, $dataTypes, $required, 0);
-        $table = $this->HtmlElements->GenerateForm('post', 'index.php?op=create', "createForm", null, $columnNames, $dataTypes, $required, 1);
+        $table = $this->HtmlElements->GenerateForm('post', 'index.php?op=create', "createForm", null, $columnNames, $htmlTypes, $required, 1);
 
         return $table;
     }
@@ -118,8 +127,7 @@ class ProductsLogic {
         return $returnArray;
     }
 
-    public function GenerateUpdateForm() {
-        $id = $_GET["id"];
+    public function GenerateUpdateForm($id) {
 
         // get data array
         $data = $this->ReadSingleProduct($id, 1);
@@ -128,11 +136,13 @@ class ProductsLogic {
 
         // get other table data
         $columnNames = $this->DataHandler->GetColumnNames("products");
-        $dataTypes = $this->DataHandler->GetTableTypes("products", 0);
-        $required = $this->DataHandler->GetTableNullValues("products", 0);
+        $dataTypes = $this->DataHandler->GetTableTypes("products");
+
+        $htmlTypes = $this->DataValidator->GetHtmlValidateData($dataTypes);
+        $required = $this->DataValidator->ValidateHTMLNotNull();
 
         // run the query
-        $table = $this->HtmlElements->GenerateForm('post', 'index.php?op=update', "updateForm", $data, $columnNames, $dataTypes, $required, 0);
+        $table = $this->HtmlElements->GenerateForm('post', 'index.php?op=update', "updateForm", $data, $columnNames, $htmlTypes, $required, 0);
 
         return $table;
     }
@@ -176,16 +186,13 @@ class ProductsLogic {
             return FALSE;
         }
 
-        // get column names
-        $columnNames = $this->DataHandler->GetColumnNames('products');
-
-        // if Fit the Array to the selected option
-        if ($option === 1 || $option === "Create") {
-            $columnNames = $this->DataHandler->SelectWithCodeFromArray($columnNames, "02");
-        }
-
         // test and return result
-        return $this->DataValidator->LoopCheckNotEmpty($columnNames, $_POST);
+        if ($option === 1 || $option === "Create") {
+            return $this->DataValidator->ValidatePHPRequired($_POST, NULL, NULL, "02");
+
+        } else {
+            return $this->DataValidator->ValidatePHPRequired($_POST);
+        }
     }
 
     // $data needs to be an Array for

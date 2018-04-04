@@ -41,9 +41,9 @@ Class HtmlElements {
     private function ButtonedTableHead($data, $tablename, $extraLength = 0, $extraColumnName = NULL) {
         // table Collumn names
         $head = "<thead class='$tablename--thead'>";
-
             foreach ($data as $key => $value) {
                 $row = "<tr class='$tablename--tr'>";
+                "<td></td>";
                     foreach ($value as $columnName => $v) {
                         $columnName[0] = strToUpper($columnName[0]);
                         $row .= "<th class='$tablename--th'>" . $columnName . "</th>";
@@ -52,6 +52,7 @@ Class HtmlElements {
                         $extraColumnName[0] = strToUpper($extraColumnName[0]);
                         $row .= "<th class='$tablename--th' colspan='$extraLength'>$extraColumnName</th>";
                     }
+
                 $row .= "</tr>";
 
                 $head .= $row;

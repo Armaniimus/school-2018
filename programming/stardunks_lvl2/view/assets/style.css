@@ -12,7 +12,7 @@ body {
     /* Colors */
     color: #efe;
     text-shadow: 1px 1px #131;
-    background-color: #383;
+    background-color: #29B014;
 }
 
 .footer {
@@ -24,7 +24,7 @@ body {
     /* Colors */
     color: #efe;
     text-shadow: 1px 1px #131;
-    background-color: #383;
+    background-color: #29B014;
 }
 
 .copyright {
@@ -73,17 +73,17 @@ main {
     padding: 5px;
 
     /* color setings */
-    background-color: #5d5;
-    box-shadow: 1px 1px 1px 0px #3b3;
-    color: white;
+    background-color: #CF1724;
+    box-shadow: 1px 1px 1px 0px #ad0502;
+    color: #fff;
 
     /* text settings */
     text-decoration: none;
     min-width: 85px;
-    text-shadow: 1px 1px 1px darkgreen;
+    text-shadow: 1px 1px 1px #444;
 
     /* border settings */
-    border-color: #3a3;
+    border-color: #ad0502;
     border-style: solid;
     border-width: 1px 2px 2px 1px;
 }
@@ -92,12 +92,13 @@ main {
 .updateForm-button:hover,
 .createForm-button:hover {
     border-width: 2px 1px 1px 2px;
-    border-color: #3a3;
-    background-color: #5c5;
+    border-color: #ad0502;
+    background-color: #be1613;
 }
 
 .buttonIconColor {
-    color: #330;
+    color: #730008;
+    text-shadow: 1px 1px #444;
 }
 
 .updateForm,
@@ -131,7 +132,10 @@ main {
 
 .updateForm-input:valid,
 .createForm-input:valid {
-    background-color: #afa;
+    /* background-color: #afa; */
+    background-color: #99ff99;
+    color: black;
+    text-shadow: 1px 1px #999;
 
     /* border color */
     border-left-color: #5a5;
@@ -142,7 +146,10 @@ main {
 
 .updateForm-input:invalid,
 .createForm-input:invalid {
-    background-color: #faa;
+    /* background-color: #faa; */
+    background-color: #ff9999;
+    color: black;
+    text-shadow: 1px 1px #999;
 
     /* border color */
     border-left-color: #a55;
@@ -176,9 +183,6 @@ main {
 
 .updateForm-label,
 .createForm-label {
-    /* color styles */
-    background-color: #055;
-    color: white;
 
     /* size styles */
     width: 50%;
@@ -194,12 +198,14 @@ main {
     border: solid 1px #222;
 }
 
-.generatedTable--th {
+.generatedTable--th,
+.updateForm-label,
+.createForm-label {
     /* color styles */
-    background-color: #055;
-    color: white;
+    background-color: #1C448D;
+    color: #eee;
 
-    text-shadow: 2px 2px 1px #111;
+    text-shadow: 1px 1px #111;
 }
 
 .subtitle {
