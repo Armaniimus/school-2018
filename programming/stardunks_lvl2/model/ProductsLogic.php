@@ -13,12 +13,11 @@ class ProductsLogic {
     public function __construct($dbName, $username, $pass, $serverAdress, $dbType) {
         $this->DataHandler = new DataHandler($dbName, $username, $pass, $serverAdress, $dbType);
 
-        $columnNames =  $this->DataHandler->GetColumnNames("products");
-        $dataTypes =    $this->DataHandler->GetTableTypes("products");
+        $columnNames =   $this->DataHandler->GetColumnNames("products");
+        $dataTypes =     $this->DataHandler->GetTableTypes("products");
         $dataNullArray = $this->DataHandler->GetTableNullValues("products");
 
         $this->DataValidator = new DataValidator($columnNames, $dataTypes, $dataNullArray);
-
         $this->HtmlElements = new HtmlElements();
     }
 
@@ -58,19 +57,15 @@ class ProductsLogic {
         return $table;
     }
 
-    public function ReadProduct($page = 1) {
-        if ($page > 0) {
-            $page--;
-        } else {
-            $page = 0;
-        }
-        $start = $page * 5;
+    public function ReadProduct($currentPage = 1) {
+        $start = $this->searchSupport($currentPage);
 
         $returnArray = [];
         $sql = "SELECT * FROM `products` LIMIT $start, 5 ";
 
         $returnArray[0] = $this->GetData($sql);
-        $returnArray[1] = $this->DataHandler->CreatePagination("products", 5);
+        $returnArray[1] = $this->DataHandler->CreatePagination("products", 5, NULL, "pagination", $currentPage);
+        $returnArray[1] = $this->HtmlElements->GeneratePaginationTable($returnArray[1], "paginationTable");
 
         return $returnArray;
     }
@@ -82,7 +77,7 @@ class ProductsLogic {
 
         if ($option == 0) {
             $buttonArray = $this->TableButtons($data, "generatedTable");
-            return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", 2, $buttonArray, "actions");
+            return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", "111", $buttonArray, "actions");
         }
 
         return $data;
@@ -95,7 +90,9 @@ class ProductsLogic {
         $_POST["product_price"] = $this->ConvertNumericData(1, NULL, $_POST["product_price"]);
 
         // set query
-        $sql = $this->DataHandler->SetUpdateQuery("products", $_POST);
+        $idName = "product_id";
+        $idValue =  $_POST[$idName];
+        $sql = $this->DataHandler->SetUpdateQuery("products", $_POST, $idName, $idValue);
 
         // run update
         $this->DataHandler->UpdateData($sql);
@@ -105,7 +102,7 @@ class ProductsLogic {
 
         // format and return
         $buttonArray = $this->TableButtons($data, "generatedTable");
-        return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", 2, $buttonArray, "actions");
+        return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", "111", $buttonArray, "actions");
     }
 
     private function TableButtons($data, $tablename, $idName = "product_id") {
@@ -152,24 +149,33 @@ class ProductsLogic {
         return $this->DataHandler->DeleteData($sql);
     }
 
-    public function SearchProduct($search, $page = 1) {
-        if ($page > 0) {
-            $page--;
-        } else {
-            $page = 0;
-        }
-        $start = $page * 5;
+    public function SearchProduct($search, $currentPage = 1) {
+        $start = $this->searchSupport($currentPage);
 
         $returnArray = [];
+
         $limit = "LIMIT $start, 5 ";
 
         $where = $this->DataHandler->SetSearchWhere($search, "products", NULL, 1);
         $sql = $this->DataHandler->SetSearchQuery('products', $search, $limit, NULL, NULL);
 
         $returnArray[0] = $this->GetData($sql);
-        $returnArray[1] = $this->DataHandler->CreatePagination("products", 5, $where, "&op=search&search=" . $search );
+        $returnArray[1] = $this->DataHandler->CreatePagination("products", 5, $where, "pagination", $currentPage, "&op=search&search=$search");
+        // var_dump($returnArray[1]);
+        $returnArray[1] = $this->HtmlElements->GeneratePaginationTable($returnArray[1], "paginationTable");
+        // var_dump($returnArray[1]);
 
         return $returnArray;
+    }
+
+    private function searchSupport($page) {
+        if ($page > 0) {
+            $page--;
+        } else {
+            $page = 0;
+        }
+
+        return (int)$page * 5;
     }
 
     private function GetData($sql) {
@@ -177,7 +183,7 @@ class ProductsLogic {
         $data = $this->ConvertNumericData(0, $data);
 
         $buttonArray = $this->TableButtons($data, "generatedTable");
-        return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", 2, $buttonArray, "actions");
+        return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", "111", $buttonArray, "actions");
     }
 
     public function TestDataSubmitted($option = 0) {

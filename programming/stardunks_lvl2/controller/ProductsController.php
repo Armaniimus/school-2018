@@ -74,7 +74,7 @@ class ProductsController {
 
         } else {
             if ( !isset($_GET["page"]) ) {
-                $_GET["page"] = "";
+                $_GET["page"] = 1;
             }
             $returnedArray = $this->ProductsLogic->ReadProduct($_GET["page"]);
 

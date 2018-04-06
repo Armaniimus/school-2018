@@ -40,7 +40,7 @@ class DataValidator {
     private function ValidateHTMLVarchar($data) {
         $data = str_replace("varchar(", "", $data);
         $data = str_replace(")", "", $data);
-        $data = "type='text' maxlength='$data' pattern='[^\s$][A-Za-z0-9\\!@#$%\^&*\s.,\\]*";
+        $data = "type='text' maxlength='$data' pattern='[^\s$][A-Za-z0-9!@#$%\^&*\s.,:;]*'";
 
         return $data;
     }
@@ -59,10 +59,7 @@ class DataValidator {
 
     private function ValidateHTMLDoubleOrDecimal($data) {
         // get numericData
-        $data = str_replace("decimal(", "", $data);
-        $data = str_replace("double(", "", $data);
-        $data = str_replace(")", "", $data);
-        $splittedData = explode(",", $data);
+        $splittedData = $this->prepValidateDecimal_Double($data);
 
         // set decimal
         $decimal = 0.1 ** $splittedData[1];
@@ -114,8 +111,8 @@ class DataValidator {
         }
 
         if ($selectCode !== NULL) {
-            $columnNames = $this->SelectWithCodeFromArray($columnNames, $code);
-            $nullDataArray = $this->SelectWithCodeFromArray($nullDataArray, $code);
+            $columnNames = $this->SelectWithCodeFromArray($columnNames, $selectCode);
+            $nullDataArray = $this->SelectWithCodeFromArray($nullDataArray, $selectCode);
         }
 
         for ($i=0; $i<count($columnNames); $i++) {
@@ -158,16 +155,48 @@ class DataValidator {
         }
     }
 
-    private function TestIfNumeric($string) {
-        if (is_numeric($string)) {
-            return TRUE;
+    private function ValidatePHPFloat($string) {
+        return is_numeric($string);
+    }
+
+    private function prepValidateDecimal_Double($data) {
+        $data = str_replace("decimal(", "", $data);
+        $data = str_replace("double(", "", $data);
+        $data = str_replace(")", "", $data);
+        $splittedData = explode(",", $data);
+
+        return $splittedData;
+    }
+
+    private function ValidatePHPDecimal_Double($string, $data) {
+        if (is_numeric($string) ) {
+            // get numericData
+            $splittedData = $this->prepValidateDecimal_Double($data);
+
+            // set decimal
+            $decimal = 0.1 ** $splittedData[1];
+
+            // set max
+            $multiplier = $splittedData[0]-$splittedData[1];
+            $max = 10 ** $multiplier;
+            $max = $max - $decimal;
+
+            if (($string < $max) == FALSE) {
+                return FALSE;
+
+            } else if ((($string*1) == round($string, 2)) == FALSE) {
+                return FALSE;
+
+            } else {
+                return TRUE;
+            }
 
         } else {
             return FALSE;
         }
     }
 
-    private function TestIfInt($string) {
+    private function ValidatePHPInt($string) {
         if (is_numeric($string) && floor($string) == $string) {
             return TRUE;
 
@@ -176,7 +205,7 @@ class DataValidator {
         }
     }
 
-    private function TestIfBoolean($string) {
+    private function ValidatePHPBoolean($string) {
         if ($string == '1' || $string == 1 || $string === TRUE ||
         $string == '0' || $string == 0 || $string === FALSE) {
             return TRUE;

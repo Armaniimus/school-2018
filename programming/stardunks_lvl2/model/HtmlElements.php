@@ -16,12 +16,17 @@ Class HtmlElements {
 
         $border = "";
         $width = "";
-        if ($option === 0 || $option === 2) {
+
+        if ($option[0] == "1") {
             $border = "border='1'";
         }
 
-        if ($option === 1 || $option === 2) {
+        if ($option[1] == "1") {
             $width = "width='100%'";
+        }
+
+        if ($option[2] == "1") {
+            // select checkboxes
         }
 
         $table = "<table $border $width class='$htmlTableName' id='$htmlTableName'>" .
@@ -36,6 +41,16 @@ Class HtmlElements {
         $headAndFoot = $this->SetHeadAndFootForm($formName, $targetUrl, $method);
         $main = $this->GenerateFormMainData($formName, $data, $columnNames, $dataTypesArray, $requiredNullArray, $option);
         return $this->CombineForm($headAndFoot["header"], $main, $headAndFoot["footer"]);
+    }
+
+    public function GeneratePaginationTable($generationData, $tableName) {
+        $table = "<table class='$tableName'><tr>";
+        for ($i=0; $i<count($generationData); $i++) {
+            $table .= "<td>" . $generationData[$i] . "</td>";
+        }
+        $table .= "</tr></table>";
+
+        return $table;
     }
 
     private function ButtonedTableHead($data, $tablename, $extraLength = 0, $extraColumnName = NULL) {

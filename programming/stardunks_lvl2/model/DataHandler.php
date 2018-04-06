@@ -7,7 +7,6 @@
         public $dbName;
         private $tableData;
 
-
         public function __construct($dbName, $username, $pass, $serverAdress, $dbType) {
             $this->tableData = [];
             $this->dbName = $dbName;
@@ -67,7 +66,7 @@
                 return $this->RunSqlQuery($readQuery, 2);
             }
 
-            public function SetUpdateQuery($tablename, $AssocArray, $idValue = NULL, $idName = NULL) {
+            public function SetUpdateQuery($tablename, $AssocArray, $idName = NULL, $idValue = NULL) {
 
                 # collumnNames collection + idName and Value collection;
                     // get the $columnNames;
@@ -75,11 +74,13 @@
 
                     // set idName if not supplied
                     if ($idName == NULL) {
+                        echo "error1";
                         $idName = $columnNames[0];
                     }
 
                     // set idValue if not supplied
                     if ($idValue == NULL) {
+                        echo "error2";
                         $idValue = $AssocArray[$idName];
                     }
 
@@ -88,7 +89,7 @@
                 # end of collumnNames collection + idName and Value collection
 
                 // validate the ID and throw an error if appropiate
-                $this->TestValid_ID($idValue, "SetUpdateQuery");
+                $this->ValidatePHP_ID($idValue, "SetUpdateQuery");
 
                 // collect the set part for the Query
                 $set = $this->SetRecordData_Assoc($columnNames, $AssocArray, 0);
@@ -106,16 +107,20 @@
             // string variables -> $updateQuery $tableName $idName
             // int variables -> $idValue
             // array variables -> $AssocArray
-            public function UpdateData($updateQuery = NULL, $tableName = NULL, $AssocArray = NULL, $idValue = NULL, $idName = "id") {
+            public function UpdateData($updateQuery = NULL, $tableName = NULL, $AssocArray = NULL, $idValue = NULL, $idName = NULL) {
 
                 if ($updateQuery == NULL) {
+                    if ($idValue == NULL || $idName == NULL) {
+                        throw new \Exception("Missing data to process the update request --[IdValue] --> $idValue  --[idName] -->$idName");
+                    }
+
                     $updateQuery = $this->SetUpdateQuery($tablename, $AssocArray, $idValue, $idName);
                 }
 
                 // run updateQuery
                 $result = $this->RunSqlQuery($updateQuery);
 
-                if ($result && $idValue != NULL) {
+                if ($result && $idValue !== NULL) {
                     $this->lastInsertedID = $idValue;
                 }
             }
@@ -124,7 +129,7 @@
             public function SetDeleteQuery($tablename, $idName, $idValue) {
 
                 // Test if a valid id is provided and throw an error if appropiate
-                $this->TestValid_ID($idValue, "SetDeleteQuery");
+                $this->ValidatePHP_ID($idValue, "SetDeleteQuery");
 
                 // set $deleteQuery
                 $deleteQuery =
@@ -361,9 +366,12 @@
             ** global variables -> tableData[$tablename][typeValues] -> this gets set by SetTableData if not set allready
             ****/
             public function GetColumnNames($tablename, $selectionCode = NULL, $force = NULL) {
-                if (!isset($this->tableData[$tablename]["columnNames"]) || $force == 1) {
+
+                $columnNamesAreSet = !isset($this->tableData[$tablename]["columnNames"]);
+                if ($columnNamesAreSet || $force == 1) {
                     $this->SetTableData($tablename);
                 }
+
                 $columnNames = $this->tableData[$tablename]["columnNames"];
 
                 if ($selectionCode !== NULL) {
@@ -378,7 +386,7 @@
         ########################
         # validation operations
         ########################
-            private function TestValid_ID($idValue, $Method = NULL) {
+            private function ValidatePHP_ID($idValue, $Method = NULL) {
 
                 // run tests and set return message if needed
                 if ($idValue == "" || $idValue == NULL) {
@@ -482,7 +490,7 @@
                 return $sql;
             }
 
-            public function CreatePagination($tablename, $resAmountPerPage, $where = "", $optional = "") {
+            public function CreatePagination($tablename, $resAmountPerPage, $where = "", $styleName, $currentPage = NULL, $optional = "") {
                 $totalItems = $this->CountDataResults($tablename, $where);
 
                 // Set total pagination numbers
@@ -494,13 +502,40 @@
                 }
 
                 // generateTable
-                $table = "<table><tr>";
-                for ($i=1; $i <= $totalPagination; $i++) {
-                    $table .= "<td> <a href='index.php?page=$i" . $optional . "'>$i</a> </td>";
-                }
-                $table .= "</tr></table>";
+                $forStart = 0;
+                $pageTable = [];
+                if ($currentPage > 1) {
+                    $pageCount = $currentPage-1;
+                    $pageTable[0] = "<a class='$styleName $styleName--start $styleName--bothEnds' href='index.php?page=$pageCount" . $optional . "'>&lt;&lt;</a>";
 
-                return $table;
+                    $forStart++;
+                    $totalPagination++;
+                }
+
+
+                $pageCount = 1;
+                $currentPageCheck = $currentPage;
+                if ($forStart == 0) {
+                    $currentPageCheck--;
+                }
+
+                for ($i=$forStart; $i<$totalPagination; $i++) {
+                    if (($currentPageCheck) == ($i) ) {
+                        $pageTable[$i] = "<a class='$styleName--Current'>$pageCount</a>";
+                        $pageCount++;
+
+                    } else {
+                        $pageTable[$i] = "<a class='$styleName' href='index.php?page=$pageCount" . $optional . "'>$pageCount</a>";
+                        $pageCount++;
+                    }
+                }
+
+                if ($currentPage < $totalPagination-1) {
+                    $pageCount = 1+$currentPage;
+                    $pageTable[$i] = "<a class='$styleName $styleName--end $styleName--bothEnds' href='index.php?page=$pageCount" . $optional . "'>&gt;&gt;</a>";
+                }
+
+                return $pageTable;
             }
         #### end of other operations
     }
