@@ -1,8 +1,8 @@
 <?php
 
-require_once "DataHandler.php";
+require_once "DataHandler/DataHandler.php";
 require_once "HtmlElements.php";
-require_once "DataValidator.php";
+require_once "DataValidator/DataValidator.php";
 
 class ProductsLogic {
 
