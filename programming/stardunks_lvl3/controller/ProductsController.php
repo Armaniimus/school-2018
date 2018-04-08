@@ -5,12 +5,47 @@ require_once 'model/ProductsLogic.php';
 class ProductsController {
     private $ProductsLogic;
 
-    public function __Construct($dbName, $username, $pass, $serverAdress = "localhost", $dbType = "mysql" ) {
+    public function __construct($dbName, $username, $pass, $serverAdress = "localhost", $dbType = "mysql" ) {
         $this->ProductsLogic = new ProductsLogic($dbName, $username, $pass, $serverAdress, $dbType);
     }
 
-    public function __Destruct() {
+    public function __destruct() {
         $this->ProductsLogic = NULL;
+    }
+
+    public function handleRequest() {
+
+        if (isset($_GET['op']) ) {
+            $op = $_GET['op'];
+
+        } else {
+            $op = "";
+        }
+
+        switch ($op) {
+            case 'create':
+                $this->collectCreateProducts();
+                break;
+
+            case 'update':
+                $this->collectUpdateProduct();
+                break;
+
+            case 'delete':
+                if (isset($_GET['id']) ) {
+                    $id = $_GET['id'];
+                    $this->collectDeleteProducts($id);
+                }
+                break;
+
+            case 'search':
+                $this->collectSearchProducts();
+                break;
+
+            default:
+                $this->collectReadProducts();
+                break;
+        }
     }
 
     // data gets extracted from the $_POST
@@ -21,7 +56,8 @@ class ProductsController {
             $lastID = $this->ProductsLogic->CreateProduct();
 
             // run a read
-            $this->collectSingleReadProduct($lastID);
+            $_GET["id"] = $lastID;
+            $this->collectReadProducts();
         } else {
             // Show the form
             $content = $this->ProductsLogic->GenerateCreateForm();
@@ -38,7 +74,7 @@ class ProductsController {
 
         } else {
             if ( !isset($_GET["page"]) ) {
-                $_GET["page"] = "";
+                $_GET["page"] = 1;
             }
             $returnedArray = $this->ProductsLogic->ReadProduct($_GET["page"]);
 
@@ -49,26 +85,32 @@ class ProductsController {
         }
     }
 
-    private function collectSingleReadProduct($id) {
-        // run singleRead
-        $content = $this->ProductsLogic->ReadSingleProduct($id);
-        require_once 'view/readSingle.php';
-    }
+    // private function collectSingleReadProduct($id) {
+    //     // run singleRead
+    //     $content = $this->ProductsLogic->ReadSingleProduct($id);
+    //     require_once 'view/readSingle.php';
+    // }
 
     // not done
     public function collectUpdateProduct() {
 
         // check if Data is submitted
         if ($this->ProductsLogic->TestDataSubmitted() ) {
-
             // Run the update
             $content = $this->ProductsLogic->UpdateProduct();
             require_once 'view/readSingle.php';
 
         // Check if There is an Id in the url
-        } else if ( isset($_GET["id"]) ) {
+    } else if ( isset($_GET["id"]) || isset($_POST['product_id']) ) {
             // Set the id
-            $id = $_GET['id'];
+            if (isset($_GET["id"]) ) {
+                $id = $_GET['id'];
+            }
+
+            // if form is incorrectly filled set the id to post id
+            else {
+                $id = $_POST['product_id'];
+            }
 
             // Show the form
             $content = $this->ProductsLogic->GenerateUpdateForm($id);

@@ -1,8 +1,8 @@
 <?php
 
-require_once "DataHandler.php";
+require_once "DataHandler/DataHandler.php";
 require_once "HtmlElements.php";
-require_once "DataValidator.php";
+require_once "DataValidator/DataValidator.php";
 
 class ProductsLogic {
 
@@ -12,7 +12,12 @@ class ProductsLogic {
 
     public function __construct($dbName, $username, $pass, $serverAdress, $dbType) {
         $this->DataHandler = new DataHandler($dbName, $username, $pass, $serverAdress, $dbType);
-        $this->DataValidator = new DataValidator();
+
+        $columnNames =   $this->DataHandler->GetColumnNames("products");
+        $dataTypes =     $this->DataHandler->GetTableTypes("products");
+        $dataNullArray = $this->DataHandler->GetTableNullValues("products");
+
+        $this->DataValidator = new DataValidator($columnNames, $dataTypes, $dataNullArray);
         $this->HtmlElements = new HtmlElements();
     }
 
@@ -30,7 +35,7 @@ class ProductsLogic {
         $columnNames = $this->DataHandler->SelectWithCodeFromArray($columnNames, "02");
 
         // convert product_price to the right format for the database
-        $_POST["product_price"] = $this->convertNumericData(1, NULL, $_POST["product_price"]);
+        $_POST["product_price"] = $this->ConvertNumericData(1, NULL, $_POST["product_price"]);
 
         // run insertQuery
         $this->DataHandler->CreateData(NULL, $tablename, $columnNames, $_POST);
@@ -39,30 +44,28 @@ class ProductsLogic {
     }
 
     public function GenerateCreateForm() {
-        $columnNames =   $this->DataHandler->GetColumnNames("products", "02");
-        $dataTypes =    $this->DataHandler->GetTableTypes("products", 0, "02");
-        $required =     $this->DataHandler->GetTableNullValues("products", 0, "02");
+        $columnNames =  $this->DataHandler->GetColumnNames("products");
+        $dataTypes =    $this->DataHandler->GetTableTypes("products");
+        // GetHtmlValidateData($dataTypesArray)
 
-        $table = $this->HtmlElements->GenerateFormTable($columnNames, $dataTypes, $required, 0);
+        $htmlTypes =    $this->DataValidator->GetHtmlValidateData($dataTypes);
+        $required =     $this->DataValidator->ValidateHTMLNotNull();
+
+        // $table = $this->HtmlElements->GenerateFormTable($columnNames, $dataTypes, $required, 0);
+        $table = $this->HtmlElements->GenerateForm('post', 'index.php?op=create', "createForm", null, $columnNames, $htmlTypes, $required, 1);
 
         return $table;
     }
 
-    public function ReadProduct($page = 1) {
-        if ($page > 0) {
-            $page--;
-        } else {
-            $page = 0;
-        }
-        $start = $page * 5;
+    public function ReadProduct($currentPage = 1) {
+        $start = $this->searchSupport($currentPage);
 
         $returnArray = [];
         $sql = "SELECT * FROM `products` LIMIT $start, 5 ";
-        $data = $this->DataHandler->ReadData($sql);
-        $data = $this->convertNumericData(0, $data);
 
-        $returnArray[0] = $this->HtmlElements->GenerateButtonedTable($data);
-        $returnArray[1] = $this->DataHandler->createPagination("products", 5);
+        $returnArray[0] = $this->GetData($sql);
+        $returnArray[1] = $this->DataHandler->CreatePagination("products", 5, NULL, "pagination", $currentPage);
+        $returnArray[1] = $this->HtmlElements->GeneratePaginationTable($returnArray[1], "paginationTable");
 
         return $returnArray;
     }
@@ -70,10 +73,11 @@ class ProductsLogic {
     public function ReadSingleProduct($id, $option = 0) {
         $sql = "SELECT * FROM `products` WHERE `product_id` = $id";
         $data = $this->DataHandler->ReadData($sql);
-        $data = $this->convertNumericData(0, $data);
+        $data = $this->ConvertNumericData(0, $data);
 
         if ($option == 0) {
-            $data = $this->HtmlElements->GenerateButtonedTable($data);
+            $buttonArray = $this->TableButtons($data, "generatedTable");
+            return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", "111", $buttonArray, "actions");
         }
 
         return $data;
@@ -83,10 +87,12 @@ class ProductsLogic {
         $id = $_POST["product_id"];
 
         // convert product_price to right format for the database
-        $_POST["product_price"] = $this->convertNumericData(1, NULL, $_POST["product_price"]);
+        $_POST["product_price"] = $this->ConvertNumericData(1, NULL, $_POST["product_price"]);
 
         // set query
-        $sql = $this->DataHandler->SetUpdateQuery("products", $_POST);
+        $idName = "product_id";
+        $idValue =  $_POST[$idName];
+        $sql = $this->DataHandler->SetUpdateQuery("products", $_POST, $idName, $idValue);
 
         // run update
         $this->DataHandler->UpdateData($sql);
@@ -95,23 +101,45 @@ class ProductsLogic {
         $data = $this->ReadSingleProduct($id, 1);
 
         // format and return
-        return $this->HtmlElements->GenerateButtonedTable($data);
+        $buttonArray = $this->TableButtons($data, "generatedTable");
+        return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", "111", $buttonArray, "actions");
     }
 
-    public function GenerateUpdateForm() {
-        $id = $_GET["id"];
+    private function TableButtons($data, $tablename, $idName = "product_id") {
+        $buttonsArray = [];
+
+        $returnArray = [];
+        $i=0;
+        foreach ($data as $key => $value) {
+
+            $id = $value[$idName];
+            $buttonsArray[0] = "<td class='button $tablename--buttons' style='min-width: 85px'> <a href='index.php?id=$id&op=read'    class='generatedTableButton' style='min-width:100%'> <i class='fas fa-book buttonIconColor'></i>  Read   </a></td>";
+            $buttonsArray[1] = "<td class='button $tablename--buttons' style='min-width: 85px'> <a href='index.php?id=$id&op=update'  class='generatedTableButton' style='min-width:100%'> <i class='fas fa-edit buttonIconColor'></i>  Update </a></td>";
+            $buttonsArray[2] = "<td class='button $tablename--buttons' style='min-width: 85px'> <a href='index.php?id=$id&op=delete'  class='generatedTableButton' style='min-width:100%'> <i class='fas fa-trash buttonIconColor'></i> Delete </a></td>";
+
+            $returnArray[$i] = $buttonsArray;
+
+            $i++;
+        }
+        return $returnArray;
+    }
+
+    public function GenerateUpdateForm($id) {
 
         // get data array
         $data = $this->ReadSingleProduct($id, 1);
         $data = $data[0];
-        $data["product_price"] = $this->convertNumericData(1, NULL, $data["product_price"]);
+        $data["product_price"] = $this->ConvertNumericData(1, NULL, $data["product_price"]);
 
-        // get table data
+        // get other table data
         $columnNames = $this->DataHandler->GetColumnNames("products");
-        $dataTypes = $this->DataHandler->GetTableTypes("products", 0);
-        $required = $this->DataHandler->GetTableNullValues("products", 0);
+        $dataTypes = $this->DataHandler->GetTableTypes("products");
 
-        $table = $this->HtmlElements->GenerateFormTable($columnNames, $dataTypes, $required, $data, 1, $id);
+        $htmlTypes = $this->DataValidator->GetHtmlValidateData($dataTypes);
+        $required = $this->DataValidator->ValidateHTMLNotNull();
+
+        // run the query
+        $table = $this->HtmlElements->GenerateForm('post', 'index.php?op=update', "updateForm", $data, $columnNames, $htmlTypes, $required, 0);
 
         return $table;
     }
@@ -121,26 +149,41 @@ class ProductsLogic {
         return $this->DataHandler->DeleteData($sql);
     }
 
-    public function SearchProduct($search, $page = 1) {
+    public function SearchProduct($search, $currentPage = 1) {
+        $start = $this->searchSupport($currentPage);
+
+        $returnArray = [];
+
+        $limit = "LIMIT $start, 5 ";
+
+        $where = $this->DataHandler->SetSearchWhere($search, "products", NULL, 1);
+        $sql = $this->DataHandler->SetSearchQuery('products', $search, $limit, NULL, NULL);
+
+        $returnArray[0] = $this->GetData($sql);
+        $returnArray[1] = $this->DataHandler->CreatePagination("products", 5, $where, "pagination", $currentPage, "&op=search&search=$search");
+        // var_dump($returnArray[1]);
+        $returnArray[1] = $this->HtmlElements->GeneratePaginationTable($returnArray[1], "paginationTable");
+        // var_dump($returnArray[1]);
+
+        return $returnArray;
+    }
+
+    private function searchSupport($page) {
         if ($page > 0) {
             $page--;
         } else {
             $page = 0;
         }
-        $start = $page * 5;
 
-        $returnArray = [];
-        $limit = "LIMIT $start, 5 ";
+        return (int)$page * 5;
+    }
 
-        $where = $this->DataHandler->SetSearchWhere($search, "products", NULL, 1);
-        $sql = $this->DataHandler->SetSearchQuery('products', $search, $limit, NULL, NULL);
+    private function GetData($sql) {
         $data = $this->DataHandler->ReadData($sql);
-        $data = $this->convertNumericData(0, $data);
+        $data = $this->ConvertNumericData(0, $data);
 
-        $returnArray[0] = $this->HtmlElements->GenerateButtonedTable($data);
-        $returnArray[1] = $this->DataHandler->createPagination("products", 5, $where, "&op=search&search=" . $search );
-
-        return $returnArray;
+        $buttonArray = $this->TableButtons($data, "generatedTable");
+        return $this->HtmlElements->GenerateButtonedTable($data, "generatedTable", "111", $buttonArray, "actions");
     }
 
     public function TestDataSubmitted($option = 0) {
@@ -149,20 +192,17 @@ class ProductsLogic {
             return FALSE;
         }
 
-        // get column names
-        $columnNames = $this->DataHandler->GetColumnNames('products');
-
-        // if Fit the Array to the selected option
-        if ($option == 1 || $option == "Create") {
-            $columnNames = $this->DataHandler->SelectWithCodeFromArray($columnNames, "02");
-        }
-
         // test and return result
-        return $this->DataValidator->LoopCheckNotEmpty($columnNames, $_POST);
+        if ($option === 1 || $option === "Create") {
+            return $this->DataValidator->ValidatePHPRequired($_POST, NULL, NULL, "02");
+
+        } else {
+            return $this->DataValidator->ValidatePHPRequired($_POST);
+        }
     }
 
     // $data needs to be an Array for
-    private function convertNumericData($option = 0, $array = NULL, $string = NULL) {
+    private function ConvertNumericData($option = 0, $array = NULL, $string = NULL) {
         if ($option == 0) {
 
             // Loop and convert all shown data

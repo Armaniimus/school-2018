@@ -1,27 +1,38 @@
 <?php
 
-/**
- *
- */
-class DataValidator {
+trait DataValidator_BackEnd {
 
-    public function __construct() {
+    public function ValidatePHPRequired($assocArray, $nullDataArray = NULL, $columnNames = NULL, $selectCode = NULL) {
+        if ($nullDataArray == NULL) {
+            $nullDataArray = $this->nullDataArray;
+        }
 
-    }
+        if ($columnNames == NULL) {
+            $columnNames = $this->columnNames;
+        }
 
-    public function LoopCheckNotEmpty($columnNames, $assocArray) {
+        if ($selectCode !== NULL) {
+            $columnNames = $this->SelectWithCodeFromArray($columnNames, $selectCode);
+            $nullDataArray = $this->SelectWithCodeFromArray($nullDataArray, $selectCode);
+        }
+
         for ($i=0; $i<count($columnNames); $i++) {
             // test each columnName inside assoc array one at a time
 
-            if (!isset($assocArray[$columnNames[$i]])) {
-                return FALSE;
+            if ($nullDataArray[$i] == "YES") {
+                continue;
             }
 
-            $test = $this->TestIfNotEmpty( $assocArray[$columnNames[$i]] );
+            else if ($nullDataArray[$i] == "NO") {
+                if (!isset($assocArray[$columnNames[$i]])) {
+                    return FALSE;
+                }
+                $test = $this->TestIfNotEmpty( $assocArray[$columnNames[$i]] );
 
-            // if one of the tests fails return false
-            if ($test == FALSE) {
-                return FALSE;
+                // if one of the tests fails return false
+                if ($test == FALSE) {
+                    return FALSE;
+                }
             }
         }
         return TRUE;
@@ -45,16 +56,35 @@ class DataValidator {
         }
     }
 
-    private function TestIfNumeric($string) {
-        if (is_numeric($string)) {
-            return TRUE;
+    private function ValidatePHPFloat_Double($string) {
+        return is_numeric($string);
+    }
+
+    private function ValidatePHPDecimal($string, $data) {
+        if (is_numeric($string) ) {
+            // get numericData
+            $data = $this->prepValidateDecimal($data);
+
+            // set decimal and max
+            $decimal = $data["decimal"];
+            $max = $data["max"];
+
+            if (!($string < $max)) {
+                return FALSE;
+
+            } else if ( !(($string*1) == round($string, 2)) ) {
+                return FALSE;
+
+            } else {
+                return TRUE;
+            }
 
         } else {
             return FALSE;
         }
     }
 
-    private function TestIfInt($string) {
+    private function ValidatePHPInt($string) {
         if (is_numeric($string) && floor($string) == $string) {
             return TRUE;
 
@@ -63,7 +93,7 @@ class DataValidator {
         }
     }
 
-    private function TestIfBoolean($string) {
+    private function ValidatePHPBoolean($string) {
         if ($string == '1' || $string == 1 || $string === TRUE ||
         $string == '0' || $string == 0 || $string === FALSE) {
             return TRUE;
@@ -118,12 +148,5 @@ class DataValidator {
 
         }
     }
-
-    private function Trim($string) {
-        return trim($string);
-    }
-
 }
-
-
- ?>
+?>

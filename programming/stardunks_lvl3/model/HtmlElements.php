@@ -1,32 +1,73 @@
 <?php
 
 Class HtmlElements {
-    private $data;
-    private $columnNames;
 
     public function __Construct() {
 
     }
 
-    private function ButtonedTableButtons($id) {
-        $read   = "<td class='button'><a href='index.php?id=$id&op=read'    class='generatedTableButton'>   <i class='fas fa-book buttonIconColor'></i>    Read    </a></td>";
-        $update = "<td class='button'><a href='index.php?id=$id&op=update'  class='generatedTableButton'>   <i class='fas fa-edit buttonIconColor'></i>  Update  </a></td>";
-        $delete = "<td class='button'><a href='index.php?id=$id&op=delete'  class='generatedTableButton'>   <i class='fas fa-trash buttonIconColor'></i>   Delete  </a></td>";
+    public function GenerateButtonedTable($data, $htmlTableName, $option, $extraColumnsArray = NULL, $specialColumnName = NULL) {
 
-        $buttons = $read . $update . $delete;
-        return $buttons;
+        if (!empty($extraColumnsArray) ) {
+            $extraLength = count($extraColumnsArray[0]);
+        } else {
+            $extraLength = 0;
+        }
+
+        $border = "";
+        $width = "";
+
+        if ($option[0] == "1") {
+            $border = "border='1'";
+        }
+
+        if ($option[1] == "1") {
+            $width = "width='100%'";
+        }
+
+        if ($option[2] == "1") {
+            // select checkboxes
+        }
+
+        $table = "<table $border $width class='$htmlTableName' id='$htmlTableName'>" .
+            $this->ButtonedTableHead($data, $htmlTableName, $extraLength, $specialColumnName) .
+            $this->ButtonedTableBody($data, $htmlTableName,  $extraColumnsArray) .
+        "</table>";
+
+        return $table;
     }
 
-    private function ButtonedTableHead($data) {
-        // table Collumn names
-        $head = "<thead>";
+    public function GenerateForm($method, $targetUrl, $formName, $data, $columnNames, $dataTypesArray, $requiredNullArray, $option = 0) {
+        $headAndFoot = $this->SetHeadAndFootForm($formName, $targetUrl, $method);
+        $main = $this->GenerateFormMainData($formName, $data, $columnNames, $dataTypesArray, $requiredNullArray, $option);
+        return $this->CombineForm($headAndFoot["header"], $main, $headAndFoot["footer"]);
+    }
 
+    public function GeneratePaginationTable($generationData, $tableName) {
+        $table = "<table class='$tableName'><tr>";
+        for ($i=0; $i<count($generationData); $i++) {
+            $table .= "<td>" . $generationData[$i] . "</td>";
+        }
+        $table .= "</tr></table>";
+
+        return $table;
+    }
+
+    private function ButtonedTableHead($data, $tablename, $extraLength = 0, $extraColumnName = NULL) {
+        // table Collumn names
+        $head = "<thead class='$tablename--thead'>";
             foreach ($data as $key => $value) {
-                $row = "<tr>";
-                    foreach ($value as $k => $v) {
-                        $row .= "<th>" . $k . "</th>";
+                $row = "<tr class='$tablename--tr'>";
+                "<td></td>";
+                    foreach ($value as $columnName => $v) {
+                        $columnName[0] = strToUpper($columnName[0]);
+                        $row .= "<th class='$tablename--th'>" . $columnName . "</th>";
                     }
-                    $row .= "<th colspan='3'>Actions</th>";
+                    if ($extraLength > 0) {
+                        $extraColumnName[0] = strToUpper($extraColumnName[0]);
+                        $row .= "<th class='$tablename--th' colspan='$extraLength'>$extraColumnName</th>";
+                    }
+
                 $row .= "</tr>";
 
                 $head .= $row;
@@ -36,80 +77,69 @@ Class HtmlElements {
         return $head;
     }
 
-    private function ButtonedTableBody($data) {
+    private function ButtonedTableBody($data, $tablename, $extraColumnsArray) {
         // table Body
-        $body = "<tbody>";
-            foreach ($data as $key => $value) {
-                $row = "<tr>";
-                    foreach ($value as $k => $v) {
-                        $row .= "<td>" . $value[$k] . "</td>";
-                    }
-                $row .= $this->ButtonedTableButtons($value['product_id']);
-                $row .= "<tr>";
+        $body = "<tbody class='$tablename--tbody'>";
 
+            $i=0;
+            foreach ($data as $key => $value) {
+                $row = "<tr class='$tablename--tr'>";
+                    foreach ($value as $k => $v) {
+                        $row .= "<td class='$tablename--td'>" . $value[$k] . "</td>";
+                    }
+
+                    for ($ii=0; $ii < count($extraColumnsArray[$i]) ; $ii++) {
+                        $row .= $extraColumnsArray[$i][$ii];
+                    }
+                $row .= "</tr>";
                 $body .= $row;
+                $i++;
             }
         $body .= "</tbody>";
         return $body;
     }
 
-    public function GenerateButtonedTable($data) {
-        $table = "<table border='1' class='generatedTable'>" .  $this->ButtonedTableHead($data) . $this->ButtonedTableBody($data) . "</table>";
-        return $table;
+    private function GenerateFormMainData($formName, $data, $columnNames, $dataTypesArray, $requiredNullArray, $option) {
+        $form = "";
+        $form .= $this->GenerateFormLabel($formName, $data[$columnNames[0]], $columnNames[0], $dataTypesArray[0], $requiredNullArray[0], 9);
+
+        for ($i=1; $i < count($columnNames); $i++) {
+            $form .= $this->GenerateFormLabel($formName, $data[$columnNames[$i]], $columnNames[$i], $dataTypesArray[$i], $requiredNullArray[$i], $option);
+        }
+
+        return $form;
     }
 
-    public function GenerateFormTable($columnNames, $types, $required, $data, $option = 0, $id = NULL) {
-
-        // Set Diffrent options Create and Update
-        if ($option == 0 || $option == "create") {
-            $i = 0;
-            $openingLines = "<form action='index.php?op=create' method='post' >";
-
-            $closingLines = "<button name='addproduct' value='1' class='generatedTableButton' type='submit'> <i class='fas buttonIconColor fa-plus'></i> Add product</button>";
-            $closingLines .= "</form>";
-
-        } else if ($option == 1 || $option == "update") {
-            $i = 1;
-            $openingLines = "<form action='index.php?op=update' method='post' >";
-            $openingLines .= "<input type='hidden' name='" . $columnNames[0] . "' value='$id'>";
-
-            $closingLines = "<button name='UpdateSubmit' value='1' class='generatedTableButton' type='submit'> <i class='fas buttonIconColor fa-edit'></i> Update</button>";
-            $closingLines .= "</form>";
+    private function GenerateFormLabel($formName, $data, $columnName, $dataType, $required, $option) {
+        if ($option === 1) {
+            $data = "";
         }
 
-        // set head
-        $head = "
-        <thead>
-            <tr>
-                <th>ColumnNames</th>
-                <th>InputFields</th>
-            </tr>
-        </thead>";
+        if ($option === 9 || $option === "hidden") {
+            $item = "<input class='$formName-input' id='$formName-$columnName-label' name='$columnName' value='$data' type='hidden'>";
 
-
-        // set Body
-        $body = "<tbody>";
-        for ($i; $i<count($columnNames); $i++) {
-            $row = "
-            <tr>
-                <td>" . $columnNames[$i] . "</td>
-                <td> <input name='" . $columnNames[$i] . "'" . $types[$i] . " value='". $data[$columnNames[$i]] . "'" . $required[$i] . "/> </td>
-            </tr>";
-            $body .= $row;
+        } else {
+            $visibleColumnName = $columnName;
+            $visibleColumnName[0] = strToUpper($columnName[0]);
+            $item = "<label class='$formName-label' for='$formName-$columnName-label'>$visibleColumnName</label>";
+            $item .= "<input class='$formName-input' id='$formName-$columnName-label' name='$columnName' value='$data' $dataType $required><span></span>";
         }
-        $body .= "</tbody>";
 
+        return $item;
+    }
 
-        // Combine the Table
-        $table =
-            $openingLines .
-            "<table border='1' class='generatedTableCreate'>" .
-                $head .
-                $body .
-            "</table>" .
-            $closingLines;
+    private function SetHeadAndFootForm($formName, $targetUrl, $method) {
+        $openingLines = "<form class='$formName' id='$formName' name='$formName' action='$targetUrl' method='$method'>";
 
-        return $table;
+        $closingLines = "<input class='$formName-button' type='submit' value='submit'>";
+        $closingLines .= "</form>";
+
+        return ["header" => $openingLines, "footer" => $closingLines];
+    }
+
+    private function CombineForm($head, $main, $footer) {
+        $form = $head . $main . $footer;
+        return $form;
     }
 }
 

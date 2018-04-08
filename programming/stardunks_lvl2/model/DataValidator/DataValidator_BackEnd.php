@@ -56,36 +56,23 @@ trait DataValidator_BackEnd {
         }
     }
 
-    private function ValidatePHPFloat($string) {
+    private function ValidatePHPFloat_Double($string) {
         return is_numeric($string);
     }
 
-    private function prepValidateDecimal_Double($data) {
-        $data = str_replace("decimal(", "", $data);
-        $data = str_replace("double(", "", $data);
-        $data = str_replace(")", "", $data);
-        $splittedData = explode(",", $data);
-
-        return $splittedData;
-    }
-
-    private function ValidatePHPDecimal_Double($string, $data) {
+    private function ValidatePHPDecimal($string, $data) {
         if (is_numeric($string) ) {
             // get numericData
-            $splittedData = $this->prepValidateDecimal_Double($data);
+            $data = $this->prepValidateDecimal($data);
 
-            // set decimal
-            $decimal = 0.1 ** $splittedData[1];
+            // set decimal and max
+            $decimal = $data["decimal"];
+            $max = $data["max"];
 
-            // set max
-            $multiplier = $splittedData[0]-$splittedData[1];
-            $max = 10 ** $multiplier;
-            $max = $max - $decimal;
-
-            if (($string < $max) == FALSE) {
+            if (!($string < $max)) {
                 return FALSE;
 
-            } else if ((($string*1) == round($string, 2)) == FALSE) {
+            } else if ( !(($string*1) == round($string, 2)) ) {
                 return FALSE;
 
             } else {
