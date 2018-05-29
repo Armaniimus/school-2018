@@ -1,0 +1,10 @@
+precentages uitrekenen
+deel/geheel*100
+
+prijsdaling of stijging uitrekenen
+nieuw% - oud% * 100 = prijsdaling of stijging in procenten
+
+
+snelheid x tijd = afstand
+afstand / snelheid = tijd
+afstand / tijd = snelheid

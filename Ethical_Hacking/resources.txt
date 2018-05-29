@@ -1,0 +1,7 @@
+rockyou passwords
+
+192.168.250.130
+
+certifiedsecure.org
+cmdchallenge.com
+hackthebox.nl
