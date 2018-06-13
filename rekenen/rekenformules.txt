@@ -1,10 +1,16 @@
 precentages uitrekenen
-deel/geheel*100
+    deel/geheel*100
 
 prijsdaling of stijging uitrekenen
-nieuw% - oud% * 100 = prijsdaling of stijging in procenten
+    nieuw% - oud% * 100 = prijsdaling of stijging in procenten
 
+snelheid tijd of afstand uitrekenen
+    snelheid in km/H 	x tijd 			  = afstand in km
+    afstand in km 	/ snelheid in km/H 	  = tijd in seconden
+    afstand in km 	/ tijd in seconden/3600	  = snelheid in km/H
 
-snelheid x tijd = afstand
-afstand / snelheid = tijd
-afstand / tijd = snelheid
+kmH naar meter per seconde
+     kmH / 3600 = meter per seconde
+
+meter per seconde naar kmH
+    3600 * meter per seconde = kmH
