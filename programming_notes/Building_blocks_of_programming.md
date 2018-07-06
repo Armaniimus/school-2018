@@ -29,7 +29,7 @@ loop
 	used to loop over your algorithme
 
 function
-	used to save an algoritme wich output can change slightly depending on the input
+	used to save an algoritme which output can change slightly depending on the input
 
 class
 	used to mimic real world objects with methods and properties
