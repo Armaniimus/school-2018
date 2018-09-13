@@ -8,8 +8,12 @@ class Router {
         // getPayload
         $url = $_SERVER['REQUEST_URI'];
         $packets = explode("/", $url);
-        var_dump($filteredPackets);
+        // var_dump($packets);
         $this->return = $this->determineDestination($packets, $rootUrlStart);
+
+        if ($this->return == FALSE) {
+            $this->return = 404;
+        }
     }
 
     /**
