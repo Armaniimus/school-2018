@@ -11,6 +11,7 @@ class Router {
         $url = $_SERVER['REQUEST_URI'];
         $packets = explode("/", $url);
         var_dump($packets);
+        var_dump($filteredPackets);
         $this->return = $this->determineDestination($packets, $rootUrlStart);
     }
 
@@ -20,29 +21,24 @@ class Router {
      */
     public function determineDestination($packets, $rootUrlStart) {
         $filteredPackets = array_slice($packets, $rootUrlStart);
-        return $this->sendToDestination($filteredPackets);
+        var_dump($filteredPackets);
+        // return $this->sendToDestination($filteredPackets);
     }
 
     public function sendToDestination($packets) {
+        // set up the name and path
+        $ctrlName = $packets[0];
+        $name = "Controller_$ctrlName";
+        $path = "Controller/$name.php";
+        require_once $path;
 
-        try {
-            // set up the name and path
-            $ctrlName = $packets[0];
-            $name = "Controller_$ctrlName";
-            $path = "Controller/$name.php";
-            require_once $path;
-
-            //setup the params and run the controller
-            if ($packets[1]) {
-                $controller = new $name($packets[1]);
-            } else {
-                $controller = new $name();
-            }
-            return $controller->return;
-
-        } catch(exeption $e) {
-            return;
+        //setup the params and run the controller
+        if ($packets[1]) {
+            $controller = new $name($packets[1]);
+        } else {
+            $controller = new $name();
         }
+        return $controller->return;
 
     }
 }
