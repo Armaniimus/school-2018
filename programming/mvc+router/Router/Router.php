@@ -1,6 +1,4 @@
 <?php
-
-
 /**
  * routs the url to the correct controller
  */
@@ -10,7 +8,6 @@ class Router {
         // getPayload
         $url = $_SERVER['REQUEST_URI'];
         $packets = explode("/", $url);
-        var_dump($packets);
         var_dump($filteredPackets);
         $this->return = $this->determineDestination($packets, $rootUrlStart);
     }
@@ -21,8 +18,7 @@ class Router {
      */
     public function determineDestination($packets, $rootUrlStart) {
         $filteredPackets = array_slice($packets, $rootUrlStart);
-        var_dump($filteredPackets);
-        // return $this->sendToDestination($filteredPackets);
+        return $this->sendToDestination($filteredPackets);
     }
 
     public function sendToDestination($packets) {
