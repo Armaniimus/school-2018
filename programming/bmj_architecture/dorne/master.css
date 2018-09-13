@@ -1,0 +1,10 @@
+main {
+    margin-top: 130px;
+    width: calc(100% / 12 * 10);
+    margin-left: calc(100% / 12 * 1)
+}
+
+.block20 {
+    width: 20%;
+    float:left;
+}
