@@ -4,7 +4,7 @@
      */
     class Controller_blabla
     {
-        function __construct($method) {
+        function __construct($method = NULL) {
             switch ($method) {
                 case 'create':
                     $this->return = $this->create();
