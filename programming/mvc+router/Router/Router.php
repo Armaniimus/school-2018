@@ -30,16 +30,21 @@ class Router {
         $ctrlName = $packets[0];
         $name = "Controller_$ctrlName";
         $path = "Controller/$name.php";
-        require_once $path;
 
-        //setup the params and run the controller
-        if ($packets[1]) {
-            $controller = new $name($packets[1]);
+        if (file_exists ($path) ) {
+            require_once $path;
+
+            //setup the params and run the controller
+            if (isset($packets[1])) {
+                $controller = new $name($packets[1]);
+            } else {
+                $controller = new $name();
+            }
+
+            return $controller->return;
         } else {
-            $controller = new $name();
+            return FALSE;
         }
-        return $controller->return;
-
     }
 }
 ?>
