@@ -4,27 +4,34 @@
      */
     class Controller_blabla
     {
-        function __construct($method = NULL) {
-            switch ($method) {
+        function __construct($method, $params = FALSE) {
+            $this->method = $method;
+            if ($params != FALSE) {
+                $this->params = $params;
+            }
+        }
+
+        public function runController() {
+            switch ($this->method) {
                 case 'create':
-                    $this->return = $this->create();
+                    return $this->create();
                     break;
 
                 case 'update':
-                    $this->return = $this->update();
+                    return $this->update();
                     break;
 
                 case 'delete':
-                    if (isset($_GET['id']) ) {
-                        $id = $_GET['id'];
-                        $this->return = $this->delete($id);
+                    if (isset($this->params[0]) ) {
+                        $id = $this->params[0];
+                        return $this->delete($id);
                     } else {
-                        $this->return = $this->read();
+                        return $this->read();
                     }
                     break;
 
                 default:
-                    $this->return = $this->read();
+                    return $this->read();
                     break;
             }
         }
