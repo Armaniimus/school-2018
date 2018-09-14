@@ -41,6 +41,9 @@ class Router {
             $this->error = "E2";
             $this->errorMessage = "no Method Defined";
             return FALSE;
+
+        } else {
+            return $result;
         }
     }
 
