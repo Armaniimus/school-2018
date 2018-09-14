@@ -22,29 +22,33 @@ class Router {
      */
     public function determineDestination($packets, $rootUrlStart) {
         $filteredPackets = array_slice($packets, $rootUrlStart);
-        return $this->sendToDestination($filteredPackets);
-    }
 
-    public function sendToDestination($packets) {
         // set up the name and path
-        $ctrlName = $packets[0];
+        $ctrlName = array_shift($filteredPackets);
         $name = "Controller_$ctrlName";
         $path = "Controller/$name.php";
 
+        // check if destination exists
         if (file_exists ($path) ) {
             require_once $path;
+            return $this->sendToDestination($filteredPackets, $path, $name);
 
-            //setup the params and run the controller
-            if (isset($packets[1])) {
-                $controller = new $name($packets[1]);
-            } else {
-                $controller = new $name();
-            }
-
-            return $controller->return;
         } else {
             return FALSE;
         }
+    }
+
+    public function sendToDestination($params, $path, $name) {
+
+        //setup the params and run the controller
+        if (isset($params[0]) && $params[0]) {
+            $controller = new $name($packets);
+        } else {
+            $controller = new $name();
+        }
+
+        return $controller->return;
+
     }
 }
 ?>
