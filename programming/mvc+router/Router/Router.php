@@ -38,17 +38,23 @@ class Router {
         }
     }
 
-    public function sendToDestination($params, $path, $name) {
+    public function sendToDestination($packets, $path, $name) {
+        // split the packets into params and methods
+        $method = array_shift($packets);
+        $params = $packets;
 
         //setup the params and run the controller
-        if (isset($params[0]) && $params[0]) {
-            $controller = new $name($packets);
+        if (isset($method) && $method) {
+            if (isset($params[0]) && $params[0]) {
+                $controller = new $name($method, $params);
+            } else {
+                $controller = new $name($method);
+            }
         } else {
-            $controller = new $name();
+            return FALSE;
         }
 
-        return $controller->return;
-
+        return $controller->runController();
     }
 }
 ?>
