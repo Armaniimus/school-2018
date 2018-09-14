@@ -18,6 +18,7 @@ require 'Router/Router-v1.php';
 
 $Router = new Router(5);
 
-echo $Router->return;
+echo $Router->run();
+echo $Router->errorMessage;
 
 ?>
