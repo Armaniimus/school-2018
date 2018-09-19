@@ -1,7 +1,6 @@
 <?php
 // router
 require 'Router/Router-v1.php';
-
 // controllers
 
 // models
