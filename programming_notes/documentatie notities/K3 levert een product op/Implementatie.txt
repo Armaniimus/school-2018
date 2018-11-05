@@ -1,0 +1,18 @@
+K3-W1 optimalizeerd het product
+	opdr1 opstellen acceptatie test
+		resultaat: 
+			ingevuld acceptatie test
+	opdr2 uitvoeren van een acceptatie test
+		resultaat: 
+			export van gewijzigde database.
+			gewijzigde broncode.
+			een werkende applicatie.
+
+K3-W2 Levert het product op
+	opdr3 opleveren van de applicatie
+		resultaat:
+
+
+K3-W3 Evalueert het opgeleverde product.
+	opdr4 schrijf een evaluatie verslag
+		resultaat: een geakkoordeerd evaluatie verslag
