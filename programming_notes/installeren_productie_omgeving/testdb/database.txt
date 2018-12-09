@@ -1,0 +1,16 @@
+Drop database monkey;
+create database monkey;
+
+create table monkey.species(
+id int auto_increment unique NOT NULL,
+name varchar(255)
+);
+
+INSERT INTO monkey.species (ID, name)
+VALUES 
+(1, "ape"),
+(2, "monkey"),
+(3, null),
+(4, "marooned monkey"),
+(5, "stealing monkey"),
+(6, "bananna less monkey");

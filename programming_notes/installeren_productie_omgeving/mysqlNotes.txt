@@ -1,0 +1,26 @@
+--initialize --console
+mysqld --console
+
+nieuw commandprompt
+alter privileges root gebruiker
+flush privileges
+
+//set old password
+CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';
+alter user 'root'@'localhost' identified with mysql_native_password by 'password';
+
+LoadModule rewrite_module modules/mod_rewrite.so
+
+dir > dir.txt
+dir < dir.txt
+
+
+open cmd en log in als root
+create database
+create user
+grant all on database
+flush privileges
+
+mysql -u user -p < "sqlfile.sql"
+
+load data into thhe database

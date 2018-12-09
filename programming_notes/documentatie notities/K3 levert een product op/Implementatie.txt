@@ -17,5 +17,5 @@ K3-W2 Levert het product op
 
 
 K3-W3 Evalueert het opgeleverde product.
-	opdr4() schrijf een evaluatie verslag
+	opdr4(60m) schrijf een evaluatie verslag
 		resultaat: een geakkoordeerd evaluatie verslag
