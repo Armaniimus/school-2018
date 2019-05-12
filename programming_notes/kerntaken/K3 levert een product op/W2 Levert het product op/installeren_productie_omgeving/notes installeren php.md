@@ -6,7 +6,7 @@ enable
     extension=php_curl.dll
     extension=php_gd2.dll
     extension=php_mbstring.dll
-    extension=php_mysql.dll
+    extension=php_mysqli.dll
     extension=php_pdo_mysql.dll
 
 zoek op system/advancedSettings/advanced/environmentVariables

@@ -22,3 +22,6 @@
 
     # data directory
     datadir="c:/mysqlData"
+
+5.
+    run following command -> mysqld --initialize-insecure --console
